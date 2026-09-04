@@ -1,0 +1,10 @@
+pyyaml
+pandas
+numpy
+yfinance
+pypdf
+pdfplumber
+requests
+pyarrow
+tabulate
+pytest

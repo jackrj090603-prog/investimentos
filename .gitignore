@@ -1,0 +1,44 @@
+# Ambientes virtuais
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python cache & compilação
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Credenciais e variáveis de ambiente confidenciais
+.env
+*.env
+agente_cvm/.env
+
+# Sessões e chaves do Telegram
+*.session
+*.session-journal
+sessao_userbot*
+
+# Bancos de dados locais SQLite
+*.db
+*.db-journal
+*.sqlite3
+*.sqlite
+agente_cvm/agente_cvm.db
+
+# Arquivos de dados pesados e temporários
+*.zip
+data/raw/*.zip
+data/raw/dfp_*
+data/raw/itr_*
+Kenny/
+*.log
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini

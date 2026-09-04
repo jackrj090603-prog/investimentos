@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#000000">
+<title>Ceará Finance — Guia do Ecossistema 2026</title>
+<meta name="description" content="Guia do Desenvolvedor: Ecossistema de Valuation Quantitativo e Monitoramento da CVM. Tudo o que foi implementado no PROJETO_CF explicado passo a passo.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23000000'/><text y='.75em' x='.18em' font-size='60' fill='%23ffffff'>🐂</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+<style>
+/* ---------- 1. TOKENS (Cinematic Dark HBO Max / Netflix) ---------- */
+:root {
+  /* superfícies */
+  --bg: #000000;
+  --bg-deep: #020202;
+  --painel: #0a0a0f;
+  --painel-2: #121217;
+  --vidro: rgba(255, 255, 255, .04);
+  --vidro-2: rgba(255, 255, 255, .08);
+  --borda: rgba(255, 255, 255, .1);
+  --borda-forte: #ffffff;
+
+  /* tinta */
+  --tinta: #ffffff;
+  --tinta-suave: #abaed2;
+  --tinta-fraca: #7d80a8;
+
+  /* HBO Max Branding */
+  --marca: #ffffff;
+  --marca-2: #a472ff;
+  --marca-fraca: rgba(255, 255, 255, .15);
+  --grad: linear-gradient(100deg, #ffffff 0%, #a472ff 52%, #ff6fae 100%);
+
+  /* funcionais (UFC & Corporate Accents) */
+  --cor-cvm: #5b9bff; /* Azul UFC */
+  --cor-monitor: #ffc24b; /* Ouro/Laranja */
+  --cor-ia: #bb8cff;
+  --cor-memoria: #46e0b0;
+  --cor-telegram: #43d0ff;
+  --cor-config: #ff86c8;
+  --cor-seguranca: #ff6b6b;
+  --cor-sucesso: #46e0a0;
+  --cor-alerta: #ff7a7a;
+
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 72px;
+
+  --radius: 20px; --radius-sm: 12px; --radius-lg: 30px;
+  --shadow: 0 26px 70px rgba(0, 0, 0, .8);
+  --shadow-sm: 0 8px 26px rgba(0, 0, 0, .6);
+
+  --fonte: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --fonte-display: "Outfit", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
+  --fonte-mono: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, monospace;
+
+  --trans: .35s cubic-bezier(.4, 0, .2, 1);
+  --nav-altura: 70px;
+}
+
+/* ---------- 2. RESET / BASE ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; overflow-x: hidden; scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: var(--fonte);
+  background: var(--bg); color: var(--tinta);
+  line-height: 1.62; font-size: 17px; overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+
+/* Text Selection */
+::selection { background: rgba(255, 255, 255, .2); color: #fff; }
+
+a { color: var(--marca-2); text-decoration: none; transition: opacity .2s; }
+a:hover { opacity: 0.8; }
+
+h1, h2, h3, h4 { font-family: var(--fonte-display); line-height: 1.12; margin: 0 0 var(--space-4); font-weight: 700; letter-spacing: -.02em; color: #fff; }
+h1 { font-size: clamp(2.2rem, 1.25rem + 3.9vw, 3.7rem); line-height: 1.05; }
+h2 { font-size: clamp(1.7rem, 1.05rem + 2.7vw, 2.6rem); }
+h3 { font-size: clamp(1.2rem, .95rem + 1.1vw, 1.5rem); }
+p { margin: 0 0 var(--space-4); }
+strong, b { font-weight: 700; color: #fff; }
+code {
+  font-family: var(--fonte-mono); background: rgba(255, 255, 255, .08); color: #cfe0ff;
+  padding: .12em .42em; border-radius: 7px; font-size: .86em; border: 1px solid rgba(255, 255, 255, .12); word-break: break-word;
+}
+
+.grad {
+  background: var(--grad);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.faisca {
+  display: inline-block; width: 1.1em; height: 1.1em; flex: 0 0 auto;
+  background: var(--marca-2);
+  clip-path: polygon(50% 0, 59% 41%, 100% 50%, 59% 59%, 50% 100%, 41% 59%, 0 50%, 41% 41%);
+  vertical-align: -.12em;
+}
+
+/* ---------- REVEAL ANIMATIONS (Netflix style) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(4px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+              filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity, filter;
+}
+.reveal.vis {
+  opacity: 1;
+  transform: translateY(0);
+  filter: none;
+}
+
+/* ---------- 3. LAYOUT / SEÇÕES ---------- */
+.wrap { width: min(1080px, 92vw); margin-inline: auto; }
+.secao {
+  padding: var(--space-8) 0; position: relative;
+  scroll-margin-top: calc(var(--nav-altura) + 14px);
+  border-bottom: 1px solid var(--borda);
+}
+.secao--faixa { background: linear-gradient(180deg, rgba(255, 255, 255, .01), rgba(255, 255, 255, .02)); }
+.secao__num {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-weight: 700; font-size: .76rem; letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: var(--marca-fraca); border: 1.5px solid var(--borda-forte);
+  padding: 7px 15px; border-radius: 999px; margin-bottom: var(--space-4);
+}
+.secao__lead { font-size: 1.13rem; color: var(--tinta-suave); max-width: 66ch; }
+
+/* ---------- 4. NAV + STEPPER ---------- */
+.nav {
+  position: sticky; top: 0; z-index: 50; height: var(--nav-altura);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: saturate(160%) blur(18px); -webkit-backdrop-filter: saturate(160%) blur(18px);
+  border-bottom: 1.5px solid var(--borda);
+}
+.nav__in { height: 100%; display: flex; align-items: center; gap: var(--space-4); }
+.nav__marca { font-family: var(--fonte-display); font-weight: 800; font-size: 1.1rem; white-space: nowrap; display: flex; align-items: center; gap: 9px; color: #fff; }
+.nav__marca .full { color: var(--tinta-suave); font-weight: 500; font-size: 0.9rem; }
+
+.stepper { display: flex; gap: 7px; margin-left: auto; overflow-x: auto; scrollbar-width: none; padding: 4px 0; }
+.stepper a {
+  flex: 0 0 auto; height: 30px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--borda); background: rgba(255, 255, 255, 0.05); color: var(--tinta-suave);
+  font-weight: 700; font-size: .82rem; cursor: pointer; transition: var(--trans);
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none;
+}
+.stepper a:hover { border-color: var(--borda-forte); color: #fff; }
+.stepper a.active { background: var(--marca-2); border-color: transparent; color: #fff; transform: scale(1.04); }
+
+/* ---------- 5. CINEMATIC VIDEO HERO (HBO Max / Netflix style) ---------- */
+.hero-streaming {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 550px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+}
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+.bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.65;
+}
+.video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #000000 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.8) 100%);
+  z-index: 2;
+}
+.hero-content {
+  position: relative;
+  z-index: 10;
+  width: min(1080px, 92vw);
+  margin-inline: auto;
+  padding-bottom: 40px;
+}
+.hero-original {
+  font-family: var(--fonte-display);
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  font-size: 0.85rem;
+  color: var(--marca-2);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-title {
+  font-size: clamp(2.5rem, 4vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  margin-bottom: 20px;
+  color: #fff;
+  text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+}
+.hero-desc {
+  max-width: 600px;
+  color: var(--tinta-suave);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.btn-hbo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1rem;
+  font-family: var(--fonte);
+  padding: 14px 28px;
+  border-radius: 8px; /* Quadrado arredondado como HBO */
+  cursor: pointer;
+  transition: var(--trans);
+  text-decoration: none;
+}
+.btn-hbo--play {
+  background: #ffffff;
+  color: #000000;
+  border: none;
+}
+.btn-hbo--play:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: scale(1.03);
+}
+.btn-hbo--list {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-left: 12px;
+}
+.btn-hbo--list:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  transform: scale(1.03);
+}
+
+.mute-btn {
+  position: absolute;
+  bottom: 30px;
+  right: 4%;
+  z-index: 15;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  transition: var(--trans);
+}
+.mute-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* Carousel indicators */
+.hero-carousel-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+}
+.dot.active {
+  background: #fff;
+  width: 24px;
+  border-radius: 10px;
+}
+
+/* ---------- 6. CARDS GRID ---------- */
+.ferramentas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-top: var(--space-6); }
+.ia-card { background: var(--painel); border: 1.5px solid var(--borda); border-radius: var(--radius); padding: var(--space-5); box-shadow: var(--shadow-sm); transition: var(--trans); }
+.ia-card:hover { transform: translateY(-3px); border-color: var(--borda-forte); box-shadow: var(--shadow); }
+.ia-card .emoji { font-size: 2rem; }
+.ia-card h3 { margin: var(--space-2) 0; }
+.ia-card p { color: var(--tinta-suave); font-size: 0.95rem; }
+.ia-card .pill { display: inline-block; margin-top: 8px; font-size: .78rem; font-weight: 700; color: #8ff0c0; background: rgba(70, 224, 160, .14); border: 1px solid rgba(70, 224, 160, .25); padding: 3px 11px; border-radius: 999px; }
+
+/* ---------- 7. BATIDAS ---------- */
+.batida { background: var(--painel); border: 1.5px solid var(--borda); border-radius: var(--radius); padding: var(--space-5); margin-top: var(--space-4); box-shadow: var(--shadow-sm); backdrop-filter: blur(10px); }
+.batida__rot {
+  display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: .78rem;
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: var(--space-3); padding: 6px 13px; border-radius: 999px;
+}
+.batida--dizer { border-left: 4px solid var(--cor-cvm); }
+.batida--dizer .batida__rot { background: rgba(91, 155, 255, .18); color: #bcd4ff; }
+.batida--dizer p { font-size: 1.2rem; font-weight: 600; color: #fff; margin: 0; }
+
+.batida--prompt { border-left: 4px solid var(--marca-2); }
+.batida--prompt .batida__rot { background: rgba(164, 114, 255, .2); color: #cfe0ff; }
+
+.batida--check { border-left: 4px solid var(--cor-sucesso); }
+.batida--check .batida__rot { background: rgba(70, 224, 160, .18); color: #8ff0c0; }
+
+.batida--racional { border-left: 4px solid var(--cor-monitor); }
+.batida--racional .batida__rot { background: rgba(255, 194, 75, .18); color: #ffd98a; }
+
+/* ---------- 8. CODE BLOCK ---------- */
+.bloco {
+  position: relative; background: rgba(6, 7, 16, .82); color: #e7ecff; border: 1px solid var(--borda); border-radius: 18px;
+  font-family: var(--fonte-mono); font-size: .92rem; line-height: 1.55;
+  margin: var(--space-3) 0; box-shadow: var(--shadow-sm); overflow: hidden; backdrop-filter: blur(8px);
+}
+.bloco::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--grad); opacity: .85; }
+.bloco__topo {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  background: rgba(255, 255, 255, .03); padding: 9px 14px; border-bottom: 1px solid var(--borda);
+}
+.bloco__rotulo { font-size: .74rem; font-weight: 700; color: #aeb6e6; letter-spacing: .05em; text-transform: uppercase; }
+.bloco__pre { margin: 0; padding: var(--space-4) var(--space-5); overflow-x: auto; white-space: pre; }
+
+.btn-copiar {
+  border: 0; cursor: pointer; font-weight: 700; font-size: .82rem; font-family: var(--fonte);
+  background: var(--grad); color: #fff; padding: 9px 17px; border-radius: 999px; transition: var(--trans);
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; box-shadow: 0 5px 16px -5px rgba(140, 120, 255, .85);
+}
+.btn-copiar:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* ---------- 9. DIAGRAMS ---------- */
+.diagrama-grid {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.peca {
+  flex: 1 1 180px;
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-top: 4px solid var(--marca-2);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+}
+.peca .e { font-size: 1.8rem; }
+.peca h4 { margin: 6px 0 2px; font-size: 1rem; color: #fff; }
+.peca code { font-size: .78rem; }
+.peca small { color: var(--tinta-suave); display: block; margin-top: 4px; font-size: .82rem; }
+
+/* ---------- 10. FLUXO ANIMADO ---------- */
+.fluxo { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--radius); padding: var(--space-6) var(--space-4) var(--space-5); box-shadow: var(--shadow-sm); margin-top: var(--space-4); backdrop-filter: blur(12px); }
+.fluxo__trilha { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.estacao {
+  flex: 1 1 148px; text-align: center; background: var(--vidro); border: 1.5px solid var(--borda);
+  border-radius: 16px; padding: 14px 8px 16px; position: relative;
+  transition: opacity .35s, transform .35s, box-shadow .35s, border-color .35s;
+}
+.estacao__ic { font-size: 2.2rem; line-height: 1; }
+.estacao__nome { font-weight: 800; font-size: .98rem; margin-top: 4px; color: #fff; }
+.estacao__sub { font-size: .78rem; color: var(--tinta-suave); margin-top: 2px; }
+
+/* ---------- 11. PAINEL DE RESULTADO ---------- */
+.painel-resultado { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--radius); padding: var(--space-5); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+.painel-resultado__topo { display: flex; align-items: center; gap: 10px; margin-bottom: var(--space-3); font-weight: 800; color: #fff; }
+.painel-resultado__topo .tag-il { margin-left: auto; font-size: .72rem; font-weight: 700; color: var(--tinta-suave); background: var(--vidro-2); border: 1px solid var(--borda); padding: 3px 10px; border-radius: 999px; }
+.metricas { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2) var(--space-3); margin-top: var(--space-4); }
+.metricas .m { background: var(--vidro); border: 1px solid var(--borda); border-radius: 12px; padding: 8px 12px; }
+.metricas .m .v { font-weight: 800; font-size: 1.15rem; line-height: 1.1; color: #fff; }
+.metricas .m .v.up { color: var(--cor-sucesso); }
+.metricas .m .k { font-size: .76rem; color: var(--tinta-suave); }
+
+/* ---------- 12. LAB EXPERIMENTS ---------- */
+.experimentos { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: var(--space-3); margin-top: 15px; }
+.exp { background: var(--vidro); border: 1px solid var(--borda); border-radius: var(--radius-sm); padding: var(--space-4); transition: var(--trans); }
+.exp:hover { border-color: var(--borda-forte); transform: translateY(-2px); }
+.exp__t { font-weight: 800; color: #fff; display: flex; gap: 8px; align-items: center; font-size: .98rem; font-family: var(--fonte-display); }
+.exp__mexa { font-size: .9rem; color: var(--tinta); margin-top: 7px; }
+.exp__obs { font-size: .88rem; color: var(--tinta-suave); margin-top: 6px; }
+
+/* ---------- CEARA FINANCE LOGO & IDENTITY ---------- */
+.cf-logo {
+  vertical-align: middle;
+  margin-right: 8px;
+  fill: #ffffff;
+}
+.cf-subtitle {
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+  margin-top: 5px;
+  font-weight: 500;
+  border-left: 2px solid var(--borda);
+  padding-left: 10px;
+}
+.setup-card {
+  background: var(--painel); border: 1px solid var(--borda); border-radius: var(--radius); padding: var(--space-6); margin-top: var(--space-5);
+}
+.callout {
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  background: var(--painel); border: 1.5px solid var(--borda); border-left: 4px solid var(--marca-2);
+  padding: var(--space-4) var(--space-5); border-radius: var(--radius-sm); margin: var(--space-5) 0;
+}
+.callout__icone { font-size: 1.5rem; flex: 0 0 auto; line-height: 1.2; }
+
+</style>
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true"></div>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav__in">
+    <div class="nav__marca">
+      <!-- Ceará Finance Official Logo -->
+      <img class="cf-logo" src="data:image/png;base64,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" alt="Ceará Finance Logo" style="width: 38px; height: 38px; object-fit: contain; margin-right: 10px;">
+      <span>CEARÁ FINANCE</span>
+      <span class="full"> — Liga de Mercado Financeiro da UFC</span>
+    </div>
+    <nav class="stepper" aria-label="Navegar por módulos">
+      <a href="#inicio" class="active">🏁 Início</a>
+      <a href="#valuation">📊 Valuation</a>
+      <a href="#agente">🤖 Agente CVM</a>
+      <a href="#statusinvest">📈 StatusInvest</a>
+      <a href="#bot-telegram">💬 Usar Bot</a>
+      <a href="#execucao">⚙️ Como Rodar</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== CINEMATIC HERO (HBO MAX / NETFLIX STYLE) ===================== -->
+<section class="hero-streaming" id="inicio">
+  <div class="video-container">
+    <!-- Loopable cinematic technology screens and graphs loop -->
+    <video autoplay muted loop playsinline class="bg-video" id="bg-video">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-and-graphs-31907-large.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
+  <div class="hero-content reveal">
+    <div class="hero-original">
+      <span class="faisca"></span> Ceará Finance Original
+    </div>
+    <h1 class="hero-title">ECOSSISTEMA QUANT & RI</h1>
+    <div class="cf-subtitle" style="border-left-color: var(--marca-2); margin-bottom: 15px;">
+      Universidade Federal do Ceará (UFC) | Extensão e Tecnologia
+    </div>
+    <p class="hero-desc">
+      A primeira liga acadêmica do Ceará apresenta o guia completo do Agente CVM e do Motor de Valuation. Acompanhe a jornada de inteligência artificial aplicada ao mercado financeiro.
+    </p>
+    <div style="margin-top: 25px;">
+      <a href="#valuation" class="btn-hbo btn-hbo--play">▶ Assistir Apresentação</a>
+      <a href="#bot-telegram" class="btn-hbo btn-hbo--list">+ Adicionar ao Telegram</a>
+    </div>
+
+    <!-- Carousel indicator representation -->
+    <div class="hero-carousel-dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Audio control for the background loop -->
+  <button class="mute-btn" id="mute-btn" type="button" aria-label="Ligar áudio" title="Ligar áudio">🔇</button>
+</section>
+
+<main id="conteudo">
+
+  <!-- ===================== MOTOR DE VALUATION ===================== -->
+  <section class="secao" id="valuation">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="secao__num">módulo 1</span>
+        <h2>O Motor de Valuation Modular (WACC, DCF e Monte Carlo)</h2>
+        <p class="secao__lead">Estruturado na pasta <code>valuation/</code>, o motor calcula o valor justo por ação de forma matemática robusta, cobrindo:</p>
+      </div>
+
+      <div class="ferramentas-grid">
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-cvm)">
+          <div class="emoji">📉</div>
+          <h3>Estimador do WACC</h3>
+          <p>Baixa cotações históricas via yfinance, calcula o Beta de mercado da incorporadora frente ao Ibovespa por regressão OLS, aplica as fórmulas de Hamada para desalavancar e realavancar o Beta, e calcula o Custo de Capital Próprio ($K_e$) via CAPM.</p>
+        </div>
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-ia)">
+          <div class="emoji">🔮</div>
+          <h3>DCF de Incorporação</h3>
+          <p>Projeta o FCFF (Fluxo de Caixa Livre da Firma) em 5 anos. Usa um driver de lançamentos VGV ➔ VSO (Vendas) ➔ POC (reconhecimento por percentual de evolução de obra) ➔ Receita Operacional Líquida ➔ EBIT ➔ NOPAT (RET de 4.0%).</p>
+        </div>
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-monitor)">
+          <div class="emoji">🎲</div>
+          <h3>Monte Carlo (10k)</h3>
+          <p>Sorteia 10.000 amostras a partir de distribuições triangulares de premissas (VSO, margem EBIT, g, Kd, Rf). Computa a média, desvio padrão, percentis P10, P50 (mediana), P90 e a probabilidade real de Upside.</p>
+        </div>
+      </div>
+
+      <h3 class="reveal" style="margin-top:var(--space-6)">Diagrama do Fluxo Operacional:</h3>
+      <div class="fluxo reveal">
+        <div class="fluxo__trilha">
+          <div class="estacao">
+            <div class="estacao__ic">🏢</div>
+            <div class="estacao__nome">Premissas</div>
+            <div class="estacao__sub">Lançamentos VGV</div>
+          </div>
+          <div class="estacao">
+            <div class="estacao__ic">📈</div>
+            <div class="estacao__nome">POC</div>
+            <div class="estacao__sub">Vendas VSO (3 anos)</div>
+          </div>
+          <div class="estacao">
+            <div class="estacao__ic">💸</div>
+            <div class="estacao__nome">EBIT / RET</div>
+            <div class="estacao__sub">RET de 4% s/ Receita</div>
+          </div>
+          <div class="estacao">
+            <div class="estacao__ic">💵</div>
+            <div class="estacao__nome">FCFF</div>
+            <div class="estacao__sub">Desconto s/ WACC</div>
+          </div>
+          <div class="estacao">
+            <div class="estacao__ic">🎯</div>
+            <div class="estacao__nome">Valor Justo</div>
+            <div class="estacao__sub">Equity / Nº Ações</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="reveal" style="margin-top:var(--space-6)">Fórmulas Matemáticas Cruciais no Código:</h3>
+      <div class="bloco reveal">
+        <div class="bloco__topo">
+          <span class="bloco__rotulo">python code · formulas</span>
+        </div>
+        <pre class="bloco__pre"><code># Hamada Desalavancagem (unlever):
+beta_unlevered = beta_levered / (1 + (1 - effective_tax_rate) * (debt_to_equity))
+
+# Hamada Realavancagem (relever):
+beta_relevered = beta_unlevered * (1 + (1 - target_tax_rate) * (target_debt_to_equity))
+
+# Custo de Capital Próprio (CAPM):
+cost_of_equity = risk_free_rate + beta_relevered * equity_risk_premium
+
+# Gordon Growth Model (Perpetuidade no ano 5):
+terminal_value = (fcff_year_5 * (1 + g)) / (wacc - g)</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AGENTE CVM ===================== -->
+  <section class="secao" id="agente">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="secao__num">módulo 2</span>
+        <h2>O Agente de Monitoramento da CVM & RI</h2>
+        <p class="secao__lead">Localizado na pasta <code>agente_cvm/</code>, este serviço atua em paralelo monitorando relatórios oficiais e respondendo perguntas de investidores.</p>
+      </div>
+
+      <div class="batida batida--dizer reveal">
+        <div class="batida__rot">Arquitetura de Banco SQLite Local</div>
+        <p>Tabelas criadas: <code>documentos</code> (dedup de links de IPE da CVM e resumos executivos), <code>estado</code> (offset do bot de chat e timestamps), e <code>conversas</code> (RAG memória).</p>
+      </div>
+
+      <div class="experimentos">
+        <div class="exp reveal">
+          <div class="exp__t">🔍 Raspagem Limpa (POST)</div>
+          <div class="exp__mexa">Acessa o WebService da CVM via POST payload, ignorando verificação de captcha quando vazio.</div>
+          <div class="exp__obs">Lê linhas por <b>&*</b> e colunas por <b>$&</b>, extraindo o link do pop-up.</div>
+        </div>
+        <div class="exp reveal">
+          <div class="exp__t">🧠 LLM Gemini (google-genai)</div>
+          <div class="exp__mexa">Utiliza o SDK <code>google-genai</code>. Extrai o conteúdo do link com scraping via URL.</div>
+          <div class="exp__obs">Chama o modelo com baixo orçamento de pensamento (thinking budget) e com a Search Tool ativada.</div>
+        </div>
+        <div class="exp reveal">
+          <div class="exp__t">📢 Telegram com Fallback</div>
+          <div class="exp__mexa">Envia alertas em formato HTML de alta legibilidade ao canal de avisos.</div>
+          <div class="exp__obs">Se a IA quebrar tags HTML, intercepta o erro 400 e reenvia uma versão limpa automaticamente.</div>
+        </div>
+        <div class="exp reveal">
+          <div class="exp__t">💻 Dashboard HTTP Nativo</div>
+          <div class="exp__mexa">Servidor nativo HTTP na porta 8000 com design dark premium e Outfit font.</div>
+          <div class="exp__obs">Possui chip de pulsação e linhas colapsáveis para ler os resumos executivos da IA.</div>
+        </div>
+      </div>
+
+      <h3 class="reveal" style="margin-top:var(--space-6)">Visualização de Arquivos do Agente:</h3>
+      <div class="diagrama-grid reveal">
+        <div class="peca">
+          <div class="e">⚙️</div>
+          <h4>Configurações</h4>
+          <code>config.py</code>
+          <small>Carrega envs e carrega o empresas.xlsx</small>
+        </div>
+        <div class="peca">
+          <div class="e">🔌</div>
+          <h4>Scraper API</h4>
+          <code>cvm.py</code>
+          <small>Consulta o ENET da CVM via POST</small>
+        </div>
+        <div class="peca">
+          <div class="e">🧠</div>
+          <h4>IA Layer</h4>
+          <code>llm.py</code>
+          <small>Interface Gemini & Search Tool</small>
+        </div>
+        <div class="peca">
+          <div class="e">💬</div>
+          <h4>Bot & RAG</h4>
+          <code>chat.py</code>
+          <small>RAG Leve por relevância no banco</small>
+        </div>
+        <div class="peca">
+          <div class="e">🖥️</div>
+          <h4>Painel Web</h4>
+          <code>dashboard.py</code>
+          <small>Servidor HTTP dark na porta 8000</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STATUSINVEST INTEGRATION ===================== -->
+  <section class="secao" id="statusinvest">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="secao__num">módulo 3</span>
+        <h2>A Integração do StatusInvest &amp; Planilhas do Mira</h2>
+        <p class="secao__lead">Garante que a sua planilha de valuation <code>MONITOR DE VALUATION DO MIRA (3).xlsx</code> receba dados do mercado em tempo real.</p>
+      </div>
+
+      <div class="batida batida--prompt reveal">
+        <div class="batida__rot">O que ocorre por baixo dos panos</div>
+        <p style="color:var(--tinta-suave); font-size:1.02rem; margin-top:5px;">O script faz uma requisição direta ao endpoint oculto de exportação do StatusInvest:</p>
+        <code style="display:block; margin: 10px 0; padding:12px; font-size:0.9rem;">https://statusinvest.com.br/category/advancedsearchresultexport?CategoryType=1&amp;search=...</code>
+        <p style="color:var(--tinta-suave); font-size:1.02rem;">Retorna um arquivo CSV contendo todas as 617 ações da bolsa brasileira. O script trata e converte as strings do padrão brasileiro (ex: "1.250,50" ou "1,25%") em floats numéricos, e reescreve a aba <b>Dados Status Invest</b> usando a biblioteca <code>openpyxl</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMO USAR O BOT (USER MANUAL) ===================== -->
+  <section class="secao" id="bot-telegram">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="secao__num">módulo 4</span>
+        <h2>Como usar a ferramenta (Manual do Usuário no Telegram)</h2>
+        <p class="secao__lead">Instruções de como a equipe e os investidores interagem diretamente com o Chat Bot no Telegram para controle e consultas rápidas.</p>
+      </div>
+
+      <div class="ferramentas-grid">
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-monitor)">
+          <div class="emoji">📊</div>
+          <h3>1. Atualizar a Planilha do Mira</h3>
+          <p>Envie os comandos <b><code>/statusinvest</code></b> ou <b><code>/atualizar</code></b> no chat privado. Você também pode enviar em linguagem natural: <i>"atualizar planilha por favor"</i>.</p>
+          <span class="pill" style="color: var(--cor-monitor); background: rgba(255, 194, 75, 0.08); border-color: var(--cor-monitor);">Gatilho Excel</span>
+        </div>
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-cvm)">
+          <div class="emoji">🔎</div>
+          <h3>2. Consultar RI (RAG Leve)</h3>
+          <p>Faça perguntas livres sobre as empresas monitoradas. Exemplo: <i>"Quais os últimos fatos divulgados pela Direcional?"</i> ou <i>"O que a Vale publicou recentemente?"</i>.</p>
+          <span class="pill" style="color: var(--cor-cvm); background: rgba(91, 155, 255, 0.08); border-color: var(--cor-cvm);">Consulta RAG</span>
+        </div>
+        <div class="ia-card reveal" style="border-top: 4px solid var(--cor-ia)">
+          <div class="emoji">🚀</div>
+          <h3>3. Comandos de Inicialização</h3>
+          <p>O comando <b><code>/start</code></b> reinicia o fluxo do bot, listando os comandos suportados e exibindo a mensagem de boas-vindas do time Ceará Finance.</p>
+          <span class="pill" style="color: var(--cor-ia); background: rgba(187, 140, 255, 0.08); border-color: var(--cor-ia);">Inicializador</span>
+        </div>
+      </div>
+
+      <h3 class="reveal" style="margin-top:var(--space-6)">Exemplo Prático de Fluxo de Mensagens:</h3>
+      
+      <!-- Caixa de diálogo simulando o chat -->
+      <div class="batida reveal" style="border-left: 4px solid var(--cor-cvm); background: rgba(10, 10, 22, 0.65);">
+        <div class="batida__rot" style="background: rgba(91, 155, 255, 0.18); color: #bcd4ff;">Simulação do Telegram</div>
+        
+        <p style="margin-bottom: 12px;"><b>Você:</b> <code>/atualizar</code></p>
+        <p style="color: var(--cor-monitor); margin-left: 20px; margin-bottom: 12px;"><b>Bot:</b> ⏳ <i>Iniciando download dos dados no StatusInvest e atualização das planilhas...</i></p>
+        <p style="color: var(--cor-sucesso); margin-left: 20px; margin-bottom: 25px;"><b>Bot:</b> ✅ <b>Planilha Atualizada!</b><br>
+        Atualizado 1 planilha(s): <code>MONITOR DE VALUATION DO MIRA (3).xlsx</code>.<br>
+        Os dados de 617 ações da B3 foram consolidados e carregados na aba 'Dados Status Invest'.</p>
+
+        <p style="margin-bottom: 12px;"><b>Você:</b> <code>Quais os fatos recentes da Direcional?</code></p>
+        <p style="color: var(--tinta-suave); margin-left: 20px;"><b>Bot:</b> Encontrei o documento <b>Aviso aos Acionistas</b> divulgado em 15/07/2026. A <b>Direcional (#DIRR3)</b> informou o pagamento de dividendos intercalares no valor de R$ 0,47 por ação ordinária... <a href="#" target="_blank">[Ver CVM]</a></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== EXECUÇÃO ===================== -->
+  <section class="secao" id="execucao">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="secao__num">módulo 5</span>
+        <h2>Guia de Execução dos Sistemas</h2>
+        <p class="secao__lead">Os arquivos de inicialização rápida foram preparados para permitir o funcionamento imediato com 2 cliques.</p>
+      </div>
+
+      <div class="setup-card reveal">
+        <h3>1. Configurar Variáveis de Ambiente</h3>
+        <p>Copie o arquivo <code>.env.example</code> para um novo arquivo <code>.env</code> na pasta <code>agente_cvm/</code> e configure as chaves:</p>
+        <div class="bloco">
+          <div class="bloco__topo">
+            <span class="bloco__rotulo">agente_cvm/.env</span>
+          </div>
+          <pre class="bloco__pre"><code>GEMINI_API_KEY=sua_chave_do_google_ai_studio
+TELEGRAM_BOT_TOKEN=seu_token_do_telegram_bot
+TELEGRAM_CHAT_ID_ALERTAS=id_do_canal_de_alertas
+TELEGRAM_CHAT_ID_CONVERSA=id_do_chat_privado_conversa</code></pre>
+        </div>
+      </div>
+
+      <div class="setup-card reveal" style="margin-top:20px;">
+        <h3>2. Executar no Windows (Dois Cliques)</h3>
+        <p>Abra a pasta <code>agente_cvm/</code> e execute o arquivo <code>iniciar.bat</code>. O script criará o ambiente virtual venv, instalará as bibliotecas e iniciará o robô de monitoramento e o painel.</p>
+        
+        <h3>3. Executar via Terminal Manual</h3>
+        <div class="bloco">
+          <div class="bloco__topo">
+            <span class="bloco__rotulo">terminal bash / powershell</span>
+          </div>
+          <pre class="bloco__pre"><code># 1. Entre no diretório do agente
+cd agente_cvm/
+
+# 2. Crie e ative o ambiente virtual
+python -m venv venv
+source venv/bin/activate  # venv\Scripts\activate no Windows
+
+# 3. Instale as bibliotecas
+pip install -r requirements.txt
+
+# 4. Inicie o sistema unificado
+python agente.py</code></pre>
+        </div>
+      </div>
+
+      <div class="callout reveal" style="margin-top: 30px;">
+        <div class="callout__icone">📡</div>
+        <div>Ao iniciar o agente, o painel interativo ficará disponível em seu navegador pelo link: <a href="http://localhost:8000" target="_blank"><b>http://localhost:8000</b></a>. As atualizações automáticas de fatos relevantes ocorrerão a cada 15 minutos.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rodape reveal">
+  <div class="wrap">
+    <p>🐂 <b>Ceará Finance — Liga de Mercado Financeiro da UFC</b></p>
+    <p style="font-size: 0.85rem; color: var(--tinta-suave); margin-top: 5px;">Formando os futuros profissionais do mercado financeiro.</p>
+  </div>
+</footer>
+
+<script>
+  // Widescreen cinematic audio mute/unmute control
+  const video = document.getElementById("bg-video");
+  const muteBtn = document.getElementById("mute-btn");
+  
+  muteBtn.addEventListener("click", () => {
+    if (video.muted) {
+      video.muted = false;
+      muteBtn.textContent = "🔊";
+      muteBtn.title = "Desligar áudio";
+    } else {
+      video.muted = true;
+      muteBtn.textContent = "🔇";
+      muteBtn.title = "Ligar áudio";
+    }
+  });
+
+  // Intersection Observer to handle Netflix-style reveal transitions
+  document.addEventListener("DOMContentLoaded", function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('vis');
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Script para marcar o link ativo na nav enquanto rola
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.secao, .hero-streaming');
+      const navLinks = document.querySelectorAll('.stepper a');
+      
+      let current = "";
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (pageYOffset >= sectionTop - 120) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${current}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

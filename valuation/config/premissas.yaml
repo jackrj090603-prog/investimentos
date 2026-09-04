@@ -1,0 +1,57 @@
+# Premissas do Modelo de Valuation - Direcional Engenharia (DIRR3)
+# Todas as escolhas do analista vivem aqui (fonte única da verdade)
+
+ativo:
+  ticker: "DIRR3.SA"
+  indice: "^BVSP"
+  cotacao_atual: 11.50
+  num_acoes: 520000000
+  divida_liquida: 613000000
+
+wacc:
+  taxa_livre_risco: 0.12       # [TROCAR] ou usar padrão (Rf)
+  premio_risco_mercado: 0.06   # [TROCAR] ERP (Damodaran)
+  custo_divida: 0.115          # [TROCAR] Kd bruto
+  aliquota_imposto: 0.04       # [TROCAR] Alíquota efetiva real sob RET (Regime Especial de Tributação)
+  de_ratio: 0.15               # Dívida / Equity alvo de mercado
+
+projecao:
+  anos: 5
+  perpetuidade_g: 0.025        # Taxa de crescimento perpétuo (g)
+  depreciacao_percent: 0.02    # Depreciação como % da Receita Líquida
+  capex_percent: 0.015         # CAPEX como % da Receita Líquida
+  nwc_percent: 0.10            # Capital de giro (NWC) como % da Receita Líquida
+
+  # Drivers operacionais reais
+  vgv_lancado:
+    - 4000000000   # Ano 1
+    - 4300000000   # Ano 2
+    - 4600000000   # Ano 3
+    - 4900000000   # Ano 4
+    - 5200000000   # Ano 5
+  
+  vso:
+    - 0.60
+    - 0.62
+    - 0.63
+    - 0.64
+    - 0.65
+  
+  # Cronograma de evolução financeira de obras (POC - Percentage of Completion)
+  # O reconhecimento de receita de vendas ocorre ao longo de 3 anos (Ano de venda, Ano + 1, Ano + 2)
+  poc:
+    ano_1: 0.20   # % da venda construída/reconhecida no primeiro ano
+    ano_2: 0.50   # % reconhecida no segundo ano
+    ano_3: 0.30   # % reconhecida no terceiro ano
+  
+  margem_ebit: 0.15
+
+monte_carlo:
+  num_simulacoes: 10000
+  distribuicoes:
+    # Formato triangular: [min, mode, max]
+    vso_media: [0.45, 0.62, 0.75]
+    margem_ebit: [0.12, 0.15, 0.18]
+    perpetuidade_g: [0.01, 0.025, 0.04]
+    taxa_livre_risco: [0.10, 0.12, 0.14]
+    custo_divida: [0.09, 0.115, 0.13]

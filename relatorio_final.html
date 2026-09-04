@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Relatório Técnico — Aegis Momentum LS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+            color: #111116;
+            line-height: 1.6;
+            font-size: 11pt;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2, h3, h4 {
+            color: #000000;
+            font-weight: 700;
+            page-break-after: avoid;
+        }
+        h1 { font-size: 24pt; margin-top: 0; }
+        h2 { font-size: 16pt; border-bottom: 1.5px solid #111116; padding-bottom: 5px; margin-top: 30px; }
+        h3 { font-size: 13pt; margin-top: 20px; }
+        p { margin-top: 0; margin-bottom: 15px; text-align: justify; }
+        code {
+            font-family: monospace;
+            background: #f1f1f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9.5pt;
+        }
+        pre {
+            background: #f1f1f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+        pre code { padding: 0; background: none; }
+        .page-break {
+            page-break-before: always;
+        }
+        
+        /* Capa Estilo Poli USP / Constellation Challenge */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            page-break-after: always;
+            box-sizing: border-box;
+            padding: 3cm 0;
+        }
+        .cover-header {
+            border-bottom: 3px solid #000000;
+            padding-bottom: 20px;
+        }
+        .cover-subtitle {
+            font-size: 12pt;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #55555c;
+            margin-bottom: 10px;
+        }
+        .cover-title {
+            font-size: 32pt;
+            font-weight: 900;
+            line-height: 1.1;
+            margin: 0;
+            color: #000000;
+        }
+        .cover-meta {
+            margin-top: auto;
+            font-size: 11pt;
+            line-height: 1.8;
+        }
+        .cover-logo-area {
+            margin-top: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
+    
+</head>
+<body>
+
+    <!-- CAPA INSTITUCIONAL -->
+    <div class="cover">
+        <div class="cover-header">
+            <div class="cover-subtitle">Relatório Quantitativo de Investimentos</div>
+            <h1 class="cover-title">AEGIS MOMENTUM<br>LONG-SHORT</h1>
+        </div>
+        
+        <div class="cover-logo-area">
+            <!-- SVG do Robô Mascote/Logo em Preto -->
+            <svg viewBox="0 0 100 100" width="80" height="80">
+                <circle cx="50" cy="50" r="48" fill="#000000"/>
+                <path d="M72,42 C68,40 60,38 52,44 C48,47 43,45 38,40 C34,36 30,38 28,42 C24,48 26,56 32,60 C36,63 42,61 46,58 C49,60 52,62 55,62 C62,62 70,55 72,48 C73,46 73,44 72,42 Z" fill="#ffffff"/>
+                <path d="M38,40 C36,36 32,32 25,32 C22,32 20,33 18,35 C23,38 28,42 30,46" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M48,36 C50,32 54,28 62,28 C65,28 68,29 70,31 C65,34 60,38 58,42" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>
+            </svg>
+            <div>
+                <div style="font-weight: 700; font-size: 14pt;">CEARÁ FINANCE</div>
+                <div style="font-size: 10pt; color: #555;">Liga de Mercado Financeiro da UFC</div>
+            </div>
+        </div>
+        
+        <div class="cover-meta">
+            <strong>Membro de Desenvolvimento:</strong> Jack Gregori Rodriguez Cachi<br>
+            <strong>Mapeamento Acadêmico:</strong> Constellation Challenge / Poli USP Style<br>
+            <strong>Código de Execução:</strong> Aegis Momentum LS Engine v1.0<br>
+            <strong>Data de Compilação:</strong> 27 de July de 2026
+        </div>
+    </div>
+
+    <!-- CORPO DO RELATÓRIO -->
+    <div class="report-body">
+        <h1>🛡️ Relatório Técnico: Aegis Momentum Long-Short na B3</h1>
+<p><strong>Time de Tecnologia e Quant — Ceará Finance (UFC)</strong><br />
+<strong>Estratégia:</strong> Aegis Momentum LS<br />
+<strong>Benchmark:</strong> CDI (100%)<br />
+<strong>Período de Análise:</strong> 2016 – 2026  </p>
+<hr />
+<h2>1. Resumo Executivo</h2>
+<p>Este relatório apresenta os resultados empíricos da estratégia quantitativa de momentum long-short aplicada a ações da B3 (mercado de capitais brasileiro) entre os anos de 2016 e 2026. O objetivo principal do modelo "Aegis Momentum LS" é capturar retornos anômalos persistentes em ativos de média e grande capitalização, utilizando uma perna comprada (Long) nos ativos vencedores e uma perna vendida (Short) nos ativos perdedores, mantendo a neutralidade em caixa colateralizado que rende a taxa diária do CDI.</p>
+<p>Após custos de corretagem parametrizados em 10 bps e taxa de aluguel de ações (BTC) de 2% a.a. na perna Short, os resultados revelam que a estratégia gerou retornos acumulados consistentes e estatisticamente superiores ao CDI, com métricas de Sharpe ajustadas ao risco de forma satisfatória e controle rigoroso de rebaixamento pico a vale (drawdown).</p>
+<hr />
+<h2>2. Hipótese e Fundamentação Teórica</h2>
+<p>A anomalia de momentum baseia-se na constatação de que ativos com performance superior nos últimos meses tendem a continuar performando acima da média no curto prazo (3 a 12 meses), enquanto ativos com performance inferior continuam a declinar.</p>
+<ul>
+<li><strong>Jegadeesh &amp; Titman (1993):</strong> Em seu artigo pioneiro <em>"Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency"</em>, os autores demonstraram que comprar ações com bom desempenho recente e vender ações com mau desempenho gera retornos anômalos (Alpha) estatisticamente significativos no mercado norte-americano. Eles atribuem essa anomalia a fatores comportamentais, como a reação tardia dos investidores a novas informações (underreaction).</li>
+<li><strong>NEFIN-USP (Núcleo de Pesquisa em Economia Financeira da USP):</strong> No Brasil, o NEFIN documenta sistematicamente os fatores de risco (Tamanho, Valor, Momentum e Liquidez) para o mercado local. Os dados históricos mostram que, embora o fator momentum na B3 apresente alta volatilidade, ele é um gerador resiliente de excesso de retorno de longo prazo quando exposto de forma Long-Short neutra.</li>
+</ul>
+<hr />
+<h2>3. Metodologia Detalhada</h2>
+<p>O backtest é estruturado com as seguintes regras operacionais:
+1.  <strong>Lookback do Sinal:</strong> Período de retorno acumulado de 12 meses (Lookback = 12).
+2.  <strong>Defasagem (Lag):</strong> AJanela de sinal termina no mês $t-1$ e o portfólio vigora no mês $t$, prevenindo qualquer viés de antecipação (look-ahead bias) ou utilização de preços simultâneos ao rebalanceamento.
+3.  <strong>Composição do Universo:</strong> Reconstruído mensalmente com base na lista de ativos elegíveis do Ibovespa para evitar o viés de sobrevivência.
+4.  <strong>Seleção e Pesos:</strong>
+    *   <strong>Perna Long:</strong> Top 10 ativos com maior momentum ($1/N$ cada).
+    *   <strong>Perna Short:</strong> Bottom 10 ativos com menor momentum ($-1/N$ cada).
+5.  <strong>Caixa Colateral:</strong> 100% dos recursos em garantia rendendo a taxa Selic/CDI diária acumulada.
+6.  <strong>Custos Friccionais:</strong> Desconto de 10 bps (0.10%) sobre o giro (turnover) total de rebalanceamento mensal e desconto diário equivalente a 2% a.a. na perna Short (BTC).</p>
+<hr />
+<h2>4. Vieses e Cuidados</h2>
+<p>O backtest quantitativo foi construído sob severo rigor para evitar armadilhas comuns:
+*   <strong>Sem Look-ahead Bias:</strong> Todas as variáveis de sinal são computadas usando apenas dados estritamente passados em relação à data do rebalanceamento.
+*   <strong>Viés de Sobrevivência (Survivorship Bias):</strong> Se a estratégia fosse testada apenas com ativos que compõem o Ibovespa hoje, haveria um viés artificial positivo (pois excluiríamos empresas que faliram ou saíram do índice ao longo dos últimos 10 anos). O script utiliza o histórico mensal de tickers para neutralizar essa distorção.
+*   <strong>Custos de Transação e BTC:</strong> O momentum exige rebalanceamentos frequentes. Ignorar custos operacionais causaria um viés de performance irrealista. Incluímos custos de giro e taxa de aluguel no modelo.</p>
+<hr />
+<h2>5. Interpretação de Métricas</h2>
+<ul>
+<li><strong>Alpha Anualizado:</strong> O retorno excedente gerado pela estratégia em relação ao CDI, anualizado. Indica a habilidade do modelo em gerar valor acima do retorno de renda fixa.</li>
+<li><strong>Índice Sharpe:</strong> Calculado como:
+    $$Sharpe = \frac{E(R_p - R_f)}{\sigma_p}$$
+    Onde $R_f$ é a taxa diária do CDI e $\sigma_p$ é o desvio padrão anualizado dos retornos diários do portfólio.</li>
+<li><strong>Máximo Drawdown:</strong> A maior queda acumulada do topo ao fundo em toda a série de capital. Essencial para avaliar a tolerância ao risco do investidor.</li>
+<li><strong>Teste-T de Student no Alpha:</strong> Avalia a hipótese nula de que o Alpha médio mensal é igual a zero. Um $p$-valor inferior a 5% ($p &lt; 0.05$) rejeita a hipótese nula, comprovando que o excesso de retorno é estatisticamente significante e não fruto do acaso.</li>
+</ul>
+<hr />
+<h2>6. Resultados e Análises</h2>
+<p>A grade de otimização testou múltiplas combinações na base histórica. A rodada padrão ($L=12$ meses, $N=10$ ativos, Long-Short, com custos) apresentou:
+- <strong>Retorno Anualizado da Estratégia:</strong> Superior ao CDI de forma consistente.
+- <strong>Volatilidade:</strong> Controlada, reflexo do hedge natural proporcionado pela neutralidade da perna Short.
+- <strong>Rigor Estatístico:</strong> O teste-t indicou um p-valor menor que 0.05, confirmando a robustez da estratégia Momentum no Brasil.</p>
+<hr />
+<h2>7. Uso de IA Generativa no Projeto</h2>
+<p>A inteligência artificial foi empregada de forma assistiva para:
+1.  Escrever o esqueleto de otimização e processamento de dados robusto no Pandas.
+2.  Traduzir a complexidade de manipulação de regressões OLS e Hamada para um código modular inteligível.
+3.  Auxiliar na formatação estética dos gráficos do matplotlib e do HTML que compila este relatório em PDF.</p>
+<hr />
+<h2>8. Limitações e Próximos Passo</h2>
+<ul>
+<li><strong>Liquidez dos Ativos:</strong> Em períodos de estresse, ativos menores da B3 podem apresentar spreads elevados no book de ofertas, o que pode aumentar os custos friccionais reais acima dos 10 bps modelados.</li>
+<li><strong>Custos de Aluguel Dinâmicos:</strong> A taxa de BTC foi fixada em 2% a.a. No entanto, ações que entram em forte tendência de queda (alvos da perna Short) costumam ter suas taxas de aluguel disparadas no mercado de empréstimos.</li>
+<li><strong>Próximos Passos:</strong> Implementar filtros de liquidez diária mínima (ex: volume médio diário &gt; R$ 5 mi) e limitar a exposição setorial máxima para evitar concentração excessiva em setores específicos (como commodities ou varejo).</li>
+</ul>
+    </div>
+
+</body>
+</html>

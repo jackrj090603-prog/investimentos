@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+
+
+
+
+<html lang="pt-br" class="no-js pt-br">
+
+
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <title>Página não encontrada - Direcional</title>
+    
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Content-Language" content="pt-br">
+
+     
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <link rel="icon" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/180x180_favicon.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/144x144_favicon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/96x96_favicon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/48x48_favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/32x32_favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/favicon/16x16_favicon.png">
+    
+    
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+
+
+
+  
+        <script>
+    var fmId = 'ada9bc2c-f7d0-4359-9eaf-851b679ab788';
+    var fmName = 'Direcional RI';
+    var fmBase = 'https://apicatalog.mziq.com/filemanager';
+    var i18nShortQuarter = 'T';
+    var language = 'pt-BR';
+    </script>
+    
+    <meta name='robots' content='noindex, follow' />
+
+	
+	<meta property="og:locale" content="pt_BR" />
+	<meta property="og:title" content="Página não encontrada - Direcional" />
+	<meta property="og:site_name" content="Direcional" />
+	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"WebSite","@id":"https:\/\/ri.direcional.com.br\/#website","url":"https:\/\/ri.direcional.com.br\/","name":"Direcional","description":"Relações com Investidores","potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/ri.direcional.com.br\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"pt-BR"}]}</script>
+	
+
+
+<link rel='dns-prefetch' href='//kit.fontawesome.com' />
+<link rel='dns-prefetch' href='//s3.amazonaws.com' />
+		
+							<script src="//www.googletagmanager.com/gtag/js?id=G-NQ5SLL0PZ6"  data-cfasync="false" data-wpfc-render="false" type="text/javascript" async></script>
+			<script data-cfasync="false" data-wpfc-render="false" type="text/javascript">
+				var mi_version = '10.2.0';
+				var mi_track_user = true;
+				var mi_no_track_reason = '';
+								var MonsterInsightsDefaultLocations = {"page_location":"https:\/\/ri.direcional.com.br\/Download.aspx\/?Arquivo=K1Y50P3rI9f7Qd2s1g8w=="};
+								if ( typeof MonsterInsightsPrivacyGuardFilter === 'function' ) {
+					var MonsterInsightsLocations = (typeof MonsterInsightsExcludeQuery === 'object') ? MonsterInsightsPrivacyGuardFilter( MonsterInsightsExcludeQuery ) : MonsterInsightsPrivacyGuardFilter( MonsterInsightsDefaultLocations );
+				} else {
+					var MonsterInsightsLocations = (typeof MonsterInsightsExcludeQuery === 'object') ? MonsterInsightsExcludeQuery : MonsterInsightsDefaultLocations;
+				}
+
+								var disableStrs = [
+										'ga-disable-G-NQ5SLL0PZ6',
+									];
+
+				/* Function to detect opted out users */
+				function __gtagTrackerIsOptedOut() {
+					for (var index = 0; index < disableStrs.length; index++) {
+						if (document.cookie.indexOf(disableStrs[index] + '=true') > -1) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				/* Disable tracking if the opt-out cookie exists. */
+				if (__gtagTrackerIsOptedOut()) {
+					for (var index = 0; index < disableStrs.length; index++) {
+						window[disableStrs[index]] = true;
+					}
+				}
+
+				/* Opt-out function */
+				function __gtagTrackerOptout() {
+					for (var index = 0; index < disableStrs.length; index++) {
+						document.cookie = disableStrs[index] + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+						window[disableStrs[index]] = true;
+					}
+				}
+
+				if ('undefined' === typeof gaOptout) {
+					function gaOptout() {
+						__gtagTrackerOptout();
+					}
+				}
+								window.dataLayer = window.dataLayer || [];
+
+				window.MonsterInsightsDualTracker = {
+					helpers: {},
+					trackers: {},
+				};
+				if (mi_track_user) {
+					function __gtagDataLayer() {
+						dataLayer.push(arguments);
+					}
+
+					function __gtagTracker(type, name, parameters) {
+						if (!parameters) {
+							parameters = {};
+						}
+
+						if (parameters.send_to) {
+							__gtagDataLayer.apply(null, arguments);
+							return;
+						}
+
+						if (type === 'event') {
+														parameters.send_to = monsterinsights_frontend.v4_id;
+							var hookName = name;
+							if (typeof parameters['event_category'] !== 'undefined') {
+								hookName = parameters['event_category'] + ':' + name;
+							}
+
+							if (typeof MonsterInsightsDualTracker.trackers[hookName] !== 'undefined') {
+								MonsterInsightsDualTracker.trackers[hookName](parameters);
+							} else {
+								__gtagDataLayer('event', name, parameters);
+							}
+							
+						} else {
+							__gtagDataLayer.apply(null, arguments);
+						}
+					}
+
+					__gtagTracker('js', new Date());
+					__gtagTracker('set', {
+						'developer_id.dZGIzZG': true,
+											});
+					if ( MonsterInsightsLocations.page_location ) {
+						__gtagTracker('set', MonsterInsightsLocations);
+					}
+										__gtagTracker('config', 'G-NQ5SLL0PZ6', {"forceSSL":"true","link_attribution":"true","page_path":'\/404.html?page=' + document.location.pathname + document.location.search + '&from=' + document.referrer} );
+										window.gtag = __gtagTracker;										(function () {
+						/* https://developers.google.com/analytics/devguides/collection/analyticsjs/ */
+						/* ga and __gaTracker compatibility shim. */
+						var noopfn = function () {
+							return null;
+						};
+						var newtracker = function () {
+							return new Tracker();
+						};
+						var Tracker = function () {
+							return null;
+						};
+						var p = Tracker.prototype;
+						p.get = noopfn;
+						p.set = noopfn;
+						p.send = function () {
+							var args = Array.prototype.slice.call(arguments);
+							args.unshift('send');
+							__gaTracker.apply(null, args);
+						};
+						var __gaTracker = function () {
+							var len = arguments.length;
+							if (len === 0) {
+								return;
+							}
+							var f = arguments[len - 1];
+							if (typeof f !== 'object' || f === null || typeof f.hitCallback !== 'function') {
+								if ('send' === arguments[0]) {
+									var hitConverted, hitObject = false, action;
+									if ('event' === arguments[1]) {
+										if ('undefined' !== typeof arguments[3]) {
+											hitObject = {
+												'eventAction': arguments[3],
+												'eventCategory': arguments[2],
+												'eventLabel': arguments[4],
+												'value': arguments[5] ? arguments[5] : 1,
+											}
+										}
+									}
+									if ('pageview' === arguments[1]) {
+										if ('undefined' !== typeof arguments[2]) {
+											hitObject = {
+												'eventAction': 'page_view',
+												'page_path': arguments[2],
+											}
+										}
+									}
+									if (typeof arguments[2] === 'object') {
+										hitObject = arguments[2];
+									}
+									if (typeof arguments[5] === 'object') {
+										Object.assign(hitObject, arguments[5]);
+									}
+									if ('undefined' !== typeof arguments[1].hitType) {
+										hitObject = arguments[1];
+										if ('pageview' === hitObject.hitType) {
+											hitObject.eventAction = 'page_view';
+										}
+									}
+									if (hitObject) {
+										action = 'timing' === arguments[1].hitType ? 'timing_complete' : hitObject.eventAction;
+										hitConverted = mapArgs(hitObject);
+										__gtagTracker('event', action, hitConverted);
+									}
+								}
+								return;
+							}
+
+							function mapArgs(args) {
+								var arg, hit = {};
+								var gaMap = {
+									'eventCategory': 'event_category',
+									'eventAction': 'event_action',
+									'eventLabel': 'event_label',
+									'eventValue': 'event_value',
+									'nonInteraction': 'non_interaction',
+									'timingCategory': 'event_category',
+									'timingVar': 'name',
+									'timingValue': 'value',
+									'timingLabel': 'event_label',
+									'page': 'page_path',
+									'location': 'page_location',
+									'title': 'page_title',
+									'referrer' : 'page_referrer',
+								};
+								for (arg in args) {
+																		if (!(!args.hasOwnProperty(arg) || !gaMap.hasOwnProperty(arg))) {
+										hit[gaMap[arg]] = args[arg];
+									} else {
+										hit[arg] = args[arg];
+									}
+								}
+								return hit;
+							}
+
+							try {
+								f.hitCallback();
+							} catch (ex) {
+							}
+						};
+						__gaTracker.create = newtracker;
+						__gaTracker.getByName = newtracker;
+						__gaTracker.getAll = function () {
+							return [];
+						};
+						__gaTracker.remove = noopfn;
+						__gaTracker.loaded = true;
+						window['__gaTracker'] = __gaTracker;
+					})();
+									} else {
+										console.log("");
+					(function () {
+						function __gtagTracker() {
+							return null;
+						}
+
+						window['__gtagTracker'] = __gtagTracker;
+						window['gtag'] = __gtagTracker;
+					})();
+									}
+			</script>
+							
+		<style id='wp-img-auto-sizes-contain-inline-css' type='text/css'>
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<link rel='stylesheet' id='wp-block-library-css' href='https://cdn-sites-assets.mziq.com/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all' />
+
+<style id='classic-theme-styles-inline-css' type='text/css'>
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=https://cdn-sites-assets.mziq.com/wp-includes/css/classic-themes.min.css */
+</style>
+<style id='global-styles-inline-css' type='text/css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel='stylesheet' id='style_css-css' href='https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/style.css?v=2' type='text/css' media='all' />
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/plugins/google-analytics-for-wordpress/assets/js/frontend-gtag.min.js" id="monsterinsights-frontend-script-js" async="async" data-wp-strategy="async"></script>
+<script data-cfasync="false" data-wpfc-render="false" type="text/javascript" id='monsterinsights-frontend-script-js-extra'>/* <![CDATA[ */
+var monsterinsights_frontend = {"js_events_tracking":"true","download_extensions":"doc,pdf,ppt,zip,xls,docx,pptx,xlsx","inbound_paths":"[{\"path\":\"\\\/go\\\/\",\"label\":\"affiliate\"},{\"path\":\"\\\/recommend\\\/\",\"label\":\"affiliate\"}]","home_url":"https:\/\/ri.direcional.com.br","hash_tracking":"false","v4_id":"G-NQ5SLL0PZ6"};/* ]]> */
+</script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/vendor/moment.min.js" id="moment_js-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/vendor/jquery-3.6.4.js" id="jquery-js"></script>
+<script type="text/javascript" src="https://kit.fontawesome.com/0b49ae5a69.js" id="fontawesome-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/vendor/slick-1.9.0/slick.min.js" id="slick_js-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/js/main.js" id="main_js-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/js/lodash.min.js" id="lodash_js-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/js/file-manager/mz.util.js" id="mz_util_js-js"></script>
+<script type="text/javascript" src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/js/file-manager/mziq.cmsint.js" id="mziq_cmsint_js-js"></script>
+<script type="text/javascript" src="https://s3.amazonaws.com/mz-prd-stockinfo/assets/js/mziq_stockinfo.min.js" id="mziq_stockinfo-js"></script>
+<meta name="generator" content="WPML ver:4.9.4 stt:1,42;" />
+
+
+
+
+<link rel="icon" href="https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2023/03/cropped-favicon-new.png" sizes="32x32" />
+<link rel="icon" href="https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2023/03/cropped-favicon-new.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2023/03/cropped-favicon-new.png" />
+<meta name="msapplication-TileImage" content="https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2023/03/cropped-favicon-new.png" />
+    
+    <script>
+        var $ = jQuery.noConflict();
+        var lang = "pt-br";
+        var stockInfoId = '67c8b0fa-51e5-11eb-8f1c-12333d57aab9';
+
+                
+                const mailerUrl = "https://apicatalog.mziq.com/mailer";
+
+    </script>
+
+    
+    
+    <!--[if lt IE 9]>
+        <script src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/js/html5shiv.js"></script>
+    <![endif]-->
+
+    <script type="text/javascript" charset="UTF-8" src="//cdn.cookie-script.com/s/17e94ed23d2469a4073b89ad7b6cfdfc.js"></script>
+</head>
+
+<body id="lang-pt-br" class="error404 wp-theme-mziq_direcional_ri">
+
+<header class="header ">
+    <div class="header__top">
+        <div class="container">
+            <span>Investidores</span>
+
+            <div class="d-flex align-items-center">
+                <a href="https://direcional.com.br/" target="_blank">Site institucional</a>
+
+                <div class="header__top__languageSwitcher">
+                    <a  class="active" href="https://ri.direcional.com.br/">PT</a><a  href="https://ri.direcional.com.br/en/">EN</a>                </div>
+
+                <img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/icons/search.svg" class="searchIcon js-trigger-search" alt="Busca">
+
+                 
+                    <ul class="header__top__socialMedia d-flex align-items-center">
+                                                    <li>
+                                <a class="d-flex align-items-center" href="https://www.facebook.com/direcionalengenharia/" target="_blank">
+                                    <img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/social-media/icon-facebook.png" alt="facebook">
+                                </a>
+                            </li>
+                                                    <li>
+                                <a class="d-flex align-items-center" href="https://www.instagram.com/direcional_engenharia/" target="_blank">
+                                    <img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/social-media/icon-instagram.png" alt="instagram">
+                                </a>
+                            </li>
+                                                    <li>
+                                <a class="d-flex align-items-center" href="https://www.linkedin.com/company/direcional-engenharia" target="_blank">
+                                    <img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/social-media/icon-linkedin.png" alt="linkedin">
+                                </a>
+                            </li>
+                                            </ul>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="header__bottom">
+        <div class="container">
+            <a href="https://ri.direcional.com.br" class="logo">
+                <img src="https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2021/03/direcional-logo-new.png" alt="Direcional">
+            </a>
+
+            <div class="header__navigation">
+                <nav class="js-target-menu">
+                    <ul id="menu-menu-principal" class="primary-menu"><li id="menu-item-207" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-207"><a href="#">A COMPANHIA</a>
+<ul class="sub-menu">
+	<li id="menu-item-274" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-274"><a href="https://ri.direcional.com.br/a-companhia/historico/">Histórico</a></li>
+	<li id="menu-item-273" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-273"><a href="https://ri.direcional.com.br/a-companhia/perfil-corporativo/">Perfil Corporativo</a></li>
+	<li id="menu-item-272" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-272"><a href="https://ri.direcional.com.br/a-companhia/missao-visao-e-valores/">Missão, Visão e Valores</a></li>
+	<li id="menu-item-1237" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1237"><a href="https://ri.direcional.com.br/a-companhia/sustentabilidade/">Sustentabilidade</a></li>
+	<li id="menu-item-271" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-271"><a href="https://ri.direcional.com.br/a-companhia/diferenciais-competitivos/">Diferenciais Competitivos</a></li>
+	<li id="menu-item-270" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-270"><a href="https://ri.direcional.com.br/a-companhia/premios-e-certificacoes/">Prêmios e Certificações</a></li>
+	<li id="menu-item-268" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-268"><a href="https://ri.direcional.com.br/a-companhia/videos/">Vídeos</a></li>
+</ul>
+</li>
+<li id="menu-item-208" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-208"><a href="#">GOVERNANÇA CORPORATIVA</a>
+<ul class="sub-menu">
+	<li id="menu-item-275" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-275"><a href="https://ri.direcional.com.br/governanca-corporativa/visao-geral/">Visão Geral</a></li>
+	<li id="menu-item-216" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-216"><a href="https://ri.direcional.com.br/governanca-corporativa/composicao-acionaria/">Composição Acionária</a></li>
+	<li id="menu-item-215" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-215"><a href="https://ri.direcional.com.br/governanca-corporativa/conselho-diretoria-e-comites/">Conselhos, Comitês e Diretoria</a></li>
+	<li id="menu-item-214" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-214"><a href="https://ri.direcional.com.br/governanca-corporativa/estatuto-politicas-e-codigos/">Estatuto Social e Políticas Internas</a></li>
+</ul>
+</li>
+<li id="menu-item-209" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-209"><a href="#">INFORMAÇÕES FINANCEIRAS</a>
+<ul class="sub-menu">
+	<li id="menu-item-281" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-281"><a href="https://ri.direcional.com.br/informacoes-financeiras/central-de-resultados/">Central de Resultados</a></li>
+	<li id="menu-item-280" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-280"><a href="https://ri.direcional.com.br/informacoes-financeiras/planilha-interativa/">Planilha Interativa</a></li>
+	<li id="menu-item-279" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-279"><a href="https://ri.direcional.com.br/informacoes-financeiras/apresentacoes-e-teleconferencia/">Apresentações e Conferências</a></li>
+	<li id="menu-item-278" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-278"><a href="https://ri.direcional.com.br/informacoes-financeiras/endividamento/">Endividamento</a></li>
+	<li id="menu-item-277" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-277"><a href="https://ri.direcional.com.br/informacoes-financeiras/documentos-entregues-a-cvm/">Documentos Entregues à CVM</a></li>
+</ul>
+</li>
+<li id="menu-item-210" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-210"><a href="#">AÇÕES</a>
+<ul class="sub-menu">
+	<li id="menu-item-285" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-285"><a href="https://ri.direcional.com.br/acoes/cotacoes-e-graficos/">Cotações e Gráficos</a></li>
+	<li id="menu-item-284" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-284"><a href="https://ri.direcional.com.br/acoes/dividendos/">Dividendos</a></li>
+	<li id="menu-item-283" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-283"><a href="https://ri.direcional.com.br/acoes/cobertura-de-analistas/">Cobertura de Analistas</a></li>
+	<li id="menu-item-282" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-282"><a href="https://ri.direcional.com.br/acoes/formador-de-mercado/">Formador de Mercado</a></li>
+</ul>
+</li>
+<li id="menu-item-211" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-211"><a href="#">SERVIÇOS AOS INVESTIDORES</a>
+<ul class="sub-menu">
+	<li id="menu-item-292" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-292"><a href="https://ri.direcional.com.br/servicos-aos-investidores/fale-conosco/">Fale Conosco</a></li>
+	<li id="menu-item-291" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-291"><a href="https://ri.direcional.com.br/servicos-aos-investidores/central-de-downloads/">Central de Downloads</a></li>
+	<li id="menu-item-290" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-290"><a href="https://ri.direcional.com.br/servicos-aos-investidores/calendario-de-eventos/">Calendário de Eventos</a></li>
+	<li id="menu-item-289" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-289"><a href="https://ri.direcional.com.br/servicos-aos-investidores/como-analisar-a-direcional/">Como Analisar a Direcional</a></li>
+	<li id="menu-item-288" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-288"><a href="https://ri.direcional.com.br/servicos-aos-investidores/perguntas-frequentes/">Perguntas Frequentes</a></li>
+	<li id="menu-item-1547" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1547"><a href="https://ri.direcional.com.br/servicos-aos-investidores/cadastre-se-mailing-list/">Cadastre-se / Mailing List</a></li>
+	<li id="menu-item-286" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-286"><a href="https://ri.direcional.com.br/servicos-aos-investidores/notas-legais/">Notas Legais</a></li>
+</ul>
+</li>
+</ul>                </nav>
+
+                <div class="header__navigation__bars js-trigger-menu">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header><div class="searchPopup js-target-search">
+    <div class="container">
+        <form action="https://ri.direcional.com.br" method="get">
+            <input type="text" name="s" id="search" value="" placeholder="Buscar" onkeyup="this.value=this.value.replace(/[<>~;{}(\[\]):=]/g,'')" required>
+            <button type="submit"><img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/icons/search.svg" alt="Buscar"></button>
+            <img src="https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/search_close.png" alt="Fechar a Busca" class="searchPopup__close js-shutdown-search">
+        </form>
+    </div>
+</div><main class="main">
+    
+    <div class="internal-banner" style="background-image:url(https://cdn-sites-assets.mziq.com/wp-content/themes/mziq_direcional_ri/img/banner_internal.png)"></div>
+    <div class="container">
+                    <h1 class="pageTitle">Página não encontrada!</h1>
+        
+        
+        <ul id="breadcrumbs" class="breadcrumbs breadcrumb hidden-xs">&nbsp;<li class="item-home"><a class="bread-link bread-home" href="https://ri.direcional.com.br" title="Home">Home</a></li><li class="separator separator-home"> / </li><li>Error 404</li></ul>    </div>
+
+    <div class="wpContent">
+                    <div class="container">
+                    
+    <h3>Não conseguimos localizar a página que você tentou acessar.</h3>
+    <a href="https://ri.direcional.com.br">Clique aqui</a> para voltar para a página principal.
+            </div>
+
+    </main><footer class="footer ">
+    
+    <div class="footer__bottom" style="background: rgba(186,12,47,1);">
+        <div class="container">
+            <div class="shortcuts">
+                <div class="item updates">
+                    <div class="action">
+                        <span>Últimas notícias</span>
+                    </div>
+                    <div class="popup">
+                        <div class="popup_header">
+                            <div class="title">
+                                <i class="icon icon-updates"></i>Últimas notícias                            </div>
+                        </div>
+                        <div class="popup_body">
+                            <div id="table1" class="js-load-content">
+                                <ul id="news_1"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item results">
+                    <div class="action">
+                        <span class="quarter">Ver Resultados 1T26</span>
+                    </div>
+                    <div class="popup">
+                        <div class="popup_header">
+                            <div class="title">
+                                <i class="icon icon-results"></i>
+                                Resultados&nbsp;
+                                <span class="quarter">1T26</span>
+                            </div>
+                            
+                            <a href="https://ri.direcional.com.br/informacoes-financeiras/central-de-resultados/" class="more">Ver todos</a>
+                        </div>
+                        <div class="popup_body">
+                            <ul class="files">
+                                                                                                            <li>
+                                            <a target="_blank" href="https://api.mziq.com/mzfilemanager/v2/d/ada9bc2c-f7d0-4359-9eaf-851b679ab788/b9e3e792-da8b-5e49-f50f-4c097cf08623?origin=2">
+                                                <i class="icon"></i>
+                                                <span class="title">Prévia Operacional</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a target="_blank" href="https://api.mziq.com/mzfilemanager/v2/d/ada9bc2c-f7d0-4359-9eaf-851b679ab788/058e4dfe-4d1c-a252-bd91-e31bb6f23ca2?origin=2">
+                                                <i class="icon"></i>
+                                                <span class="title">Apresentação de Resultados</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a target="_blank" href="https://www.youtube.com/watch?v=BH5SboaG1-Q">
+                                                <i class="icon"></i>
+                                                <span class="title">Conferência de Resultados</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a target="_blank" href="https://api.mziq.com/mzfilemanager/v2/d/ada9bc2c-f7d0-4359-9eaf-851b679ab788/44d38c37-baad-14bd-442e-10af6efc7c91?origin=2">
+                                                <i class="icon"></i>
+                                                <span class="title">Release de Resultados</span>
+                                            </a>
+                                        </li>
+                                                                            <li>
+                                            <a target="_blank" href="https://api.mziq.com/mzfilemanager/v2/d/ada9bc2c-f7d0-4359-9eaf-851b679ab788/128a4b1b-7b15-7f04-4cd1-e775d0df1bbc?origin=2">
+                                                <i class="icon"></i>
+                                                <span class="title">ITR</span>
+                                            </a>
+                                        </li>
+                                                                                                </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <script>                   
+                    $(function () {
+                        $(".shortcuts .item").click(function() {
+                            // $(".shortcuts .item .popup").slideUp();
+                            $(this).find(".popup").slideToggle();
+                            $(this).toggleClass('active');
+                        });
+
+                        $(".shortcuts .item").mouseenter(function() {
+                            $(this).addClass('active');
+                        });
+
+                        $(".shortcuts .item").mouseleave(function() {
+                            $(this).removeClass('active');
+                        });
+                        
+
+                        const categoriesFooter = [
+                            { title:'', internal_name: 'ultimas_noticias' }
+                        ];
+
+                        const configPageFooter = {
+                            categories: categoriesFooter,
+                            isSpecific: false,
+                            groupByYear: false,
+                            groupByQuarter: false,
+                            getAllYears: true,
+                            yearsFieldId: '#fano',
+                            getByCompanies: false,
+                            companiesFieldId: '',
+                            clearCallback: clearTablesFooter,
+                            fillCallback: fillFooter,
+                            loadingCallback: startLoading,
+                            loadedCallback: stopLoading,
+                            language: 'pt_BR', //API LANGUAGUE
+                            baseUrl: 'Clique Aqui para Acessar',
+                            enableDebug: true,
+                            mount: 5
+                        };
+
+                        console.log("Footer Instance");
+                        const cmsFooter = new mzcms(configPageFooter);
+
+                        
+                                cmsFooter.init();
+
+                                            });
+                </script>
+            </div>
+
+            <ul class="quotes js-target-quotes">
+                <li class="TICKER name">-</li>
+                <li class="TICKER price">-</li>
+                <li class="TICKER var">-</li>
+
+                <li class="VOL name d-md-block d-none">VOL</li>
+                <li class="VOL price d-md-block d-none">-</li>
+
+                <li class="IBOV name d-md-block d-none">-</li>
+                <li class="IBOV price d-md-block d-none">-</li>
+                <li class="IBOV var d-md-block d-none">-</li>
+
+                <li class="IMOB name d-md-block d-none">-</li>
+                <li class="IMOB price d-md-block d-none">-</li>
+                <li class="IMOB var d-md-block d-none">-</li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/mziq_direcional_ri/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+
+<!-- BEGIN recaptcha, injected by plugin wp-recaptcha-integration  -->
+<script type="text/javascript">
+		var recaptcha_widgets={};
+		function wp_recaptchaLoadCallback(){
+			try {
+				grecaptcha;
+			} catch(err){
+				return;
+			}
+			var e = document.querySelectorAll ? document.querySelectorAll('.g-recaptcha:not(.wpcf7-form-control)') : document.getElementsByClassName('g-recaptcha'),
+				form_submits;
+
+			for (var i=0;i<e.length;i++) {
+				(function(el){
+					var wid;
+					// check if captcha element is unrendered
+					if ( ! el.childNodes.length) {
+						wid = grecaptcha.render(el,{
+							'sitekey':'6LdRx98ZAAAAAM60eqX17yu5gYOqv6ZsNjuSvvIi',
+							'theme':el.getAttribute('data-theme') || 'light'
+						});
+						el.setAttribute('data-widget-id',wid);
+					} else {
+						wid = el.getAttribute('data-widget-id');
+						grecaptcha.reset(wid);
+					}
+				})(e[i]);
+			}
+		}
+
+		// if jquery present re-render jquery/ajax loaded captcha elements
+		if ( typeof jQuery !== 'undefined' )
+			jQuery(document).ajaxComplete( function(evt,xhr,set){
+				if( xhr.responseText && xhr.responseText.indexOf('6LdRx98ZAAAAAM60eqX17yu5gYOqv6ZsNjuSvvIi') !== -1)
+					wp_recaptchaLoadCallback();
+			} );
+
+		</script><script src="https://www.google.com/recaptcha/api.js?onload=wp_recaptchaLoadCallback&#038;render=explicit" async defer></script>
+<!-- END recaptcha -->
+
+<script>
+    var jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Direcional RI",
+        "logo": "https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/520/2021/03/direcional-logo-new.png", 
+        "url": "https://ri.direcional.com.br"
+    };
+
+    var script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(jsonLd);
+    document.head.appendChild(script); // ou document.body.appendChild(script);
+</script>
+
+</body>
+</html>
+
+<!--
+Performance optimized by W3 Total Cache. Learn more: https://www.boldgrid.com/w3-total-cache/?utm_source=w3tc&utm_medium=footer_comment&utm_campaign=free_plugin
+
+Page Caching using Redis (Requested URI contains query) 
+Content Delivery Network via Amazon Web Services: CloudFront: cdn-sites-assets.mziq.com
+
+Served from: ri.direcional.com.br @ 2026-07-27 18:28:14 by W3 Total Cache
+-->

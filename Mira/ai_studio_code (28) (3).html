@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gregori Markets | Workstation & Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        
+        :root {
+            --bg: #030712;
+            --panel: rgba(17, 24, 39, 0.7);
+            --text: #f3f4f6;
+            --border: rgba(255, 255, 255, 0.08);
+            --accent: #3b82f6;
+        }
+
+        .light-theme {
+            --bg: #f3f4f6;
+            --panel: rgba(255, 255, 255, 0.9);
+            --text: #111827;
+            --border: rgba(0, 0, 0, 0.1);
+            --accent: #2563eb;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            transition: background 0.3s ease;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar { 
+            width: 300px; 
+            background: rgba(0,0,0,0.4); 
+            backdrop-filter: blur(20px); 
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content { flex: 1; overflow-y: auto; height: 100vh; scroll-behavior: smooth; }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .glass-panel {
+            background: var(--panel);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+        /* ESTILO DOS CARDS MACRO COM DATAS */
+        .macro-card {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.03) 0%, rgba(0, 0, 0, 0) 100%);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .macro-card:hover {
+            background: rgba(59, 130, 246, 0.08);
+            border-color: var(--accent);
+        }
+
+        .date-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ESTILOS VALUATION HUB */
+        .valuation-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+        .valuation-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); }
+
+        .result-card {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        #academy-view, #valuation-view { display: none; }
+        .video-aspect { aspect-ratio: 16 / 9; width: 100%; background: #000; border-radius: 1rem; }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar p-6 italic font-black uppercase z-20">
+        <div class="mb-8">
+            <h2 class="text-2xl font-extrabold italic tracking-tighter">GREGORI<span class="text-blue-500">MARKETS</span></h2>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="h-1 w-1 bg-blue-500 rounded-full"></span>
+                <p class="text-[9px] text-gray-500 tracking-[0.3em]">Institutional Grade</p>
+            </div>
+        </div>
+
+        <nav class="space-y-2 mb-8">
+            <button onclick="switchView('terminal')" class="w-full text-blue-500 bg-blue-500/10 p-3 rounded-xl text-[10px] font-bold tracking-widest flex items-center justify-between group">
+                <span>TERMINAL</span>
+                <i class="fas fa-chart-line"></i>
+            </button>
+            
+            <!-- NOVA ABA VALUATION -->
+            <button onclick="switchView('valuation')" class="w-full text-green-500 bg-green-500/10 p-3 rounded-xl text-[10px] font-bold tracking-widest flex items-center justify-between group">
+                <span>VALUATION HUB</span>
+                <i class="fas fa-calculator"></i>
+            </button>
+
+            <button onclick="toggleTheme()" class="w-full text-gray-400 bg-white/5 p-3 rounded-xl text-[10px] font-bold tracking-widest hover:text-white transition flex items-center justify-between">
+                <span>TEMA</span>
+                <i class="fas fa-circle-half-stroke"></i>
+            </button>
+        </nav>
+
+        <!-- ACADEMY LIST -->
+        <div class="flex-1 flex flex-col min-h-0">
+            <h3 class="text-[9px] text-gray-500 tracking-widest mb-4 border-b border-white/5 pb-2">CURRICULUM MENTORIA</h3>
+            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-1">
+                <script>
+                    const modulos = ["Finanças Pessoais", "Economia e Indicadores", "Matemática Financeira", "Mercado de Capitais", "Renda Fixa", "Renda Variável", "Fundos de Inv.", "Análise Fundamentalista", "Price Action Pro", "Gestão de Risco"];
+                    modulos.forEach((mod, i) => {
+                        document.write(`
+                            <div onclick="switchView('academy', '${mod}')" class="p-3 hover:bg-white/5 rounded-lg cursor-pointer group transition">
+                                <h4 class="text-[10px] text-gray-400 group-hover:text-blue-400 transition leading-tight">${(i+1)}. ${mod.toUpperCase()}</h4>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content custom-scrollbar">
+        <header class="sticky top-0 z-30 p-4 border-b border-white/5 bg-[var(--bg)]/80 backdrop-blur-md flex justify-between items-center px-8 italic font-black uppercase">
+            <div class="flex items-center gap-4">
+                <span id="view-title" class="text-[10px] tracking-[0.2em] text-blue-500">Live Market Terminal</span>
+            </div>
+            <div id="clock" class="text-[10px] font-mono text-gray-500 tracking-widest">00:00:00</div>
+        </header>
+
+        <!-- VIEW 1: TERMINAL (MANTER TUDO) -->
+        <div id="terminal-view">
+            <div class="px-6 pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="https://www.bcb.gov.br/publicacoes/focus" target="_blank" class="macro-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[8px] text-blue-500 font-bold tracking-widest uppercase mb-1">Boletim Semanal</p>
+                            <h4 class="text-xs font-black italic text-white uppercase group-hover:text-blue-400 transition">Relatório Focus</h4>
+                        </div>
+                        <i class="fas fa-file-contract text-blue-500/40 text-xl"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-[10px] text-gray-500 leading-tight italic">Expectativas do mercado para IPCA, PIB e Selic.</p>
+                        <div class="date-badge"><i class="far fa-calendar-check"></i> PRX. EDIÇÃO: SEGUNDA, 08:30</div>
+                    </div>
+                </a>
+
+                <a href="https://www.bcb.gov.br/publicacoes/atascopom" target="_blank" class="macro-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[8px] text-orange-500 font-bold tracking-widest uppercase mb-1">Política Monetária</p>
+                            <h4 class="text-xs font-black italic text-white uppercase group-hover:text-orange-400 transition">Atas do COPOM</h4>
+                        </div>
+                        <i class="fas fa-gavel text-orange-500/40 text-xl"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-[10px] text-gray-500 leading-tight italic">Fundamentos técnicos das decisões de juros.</p>
+                        <div class="date-badge border-orange-500/20 text-orange-500 bg-orange-500/10"><i class="far fa-clock"></i> PRX. PUBLICAÇÃO: 24/06/2024</div>
+                    </div>
+                </a>
+
+                <a href="https://www.bcb.gov.br/controleinflacao/copom" target="_blank" class="macro-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-[8px] text-green-500 font-bold tracking-widest uppercase mb-1">Agenda Autoridade</p>
+                            <h4 class="text-xs font-black italic text-white uppercase group-hover:text-green-400 transition">Portal do COPOM</h4>
+                        </div>
+                        <i class="fas fa-landmark text-green-500/40 text-xl"></i>
+                    </div>
+                    <div class="space-y-3">
+                        <p class="text-[10px] text-gray-500 leading-tight italic">Calendário oficial e metas de inflação.</p>
+                        <div class="date-badge border-green-500/20 text-green-500 bg-green-500/10"><i class="fas fa-bullseye"></i> PRX. REUNIÃO: 18/19 JUN</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="bento-grid">
+                <div class="glass-panel col-span-12 lg:col-span-8 h-[450px] flex flex-col">
+                    <div class="p-4 border-b border-white/5"><span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Monitor Principal</span></div>
+                    <div class="flex-1" id="chart_gold"></div>
+                </div>
+                <div class="glass-panel col-span-12 lg:col-span-4 h-[450px] flex flex-col">
+                    <div class="p-4 border-b border-white/5"><span class="text-[10px] font-bold text-orange-500 uppercase tracking-widest">News Flow</span></div>
+                    <div id="rss-feed" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"></div>
+                </div>
+                <div class="glass-panel col-span-12 md:col-span-4 h-[300px] flex flex-col"><div class="flex-1" id="chart_silver"></div></div>
+                <div class="glass-panel col-span-12 md:col-span-4 h-[300px] flex flex-col"><div class="flex-1" id="chart_oil"></div></div>
+                <div class="glass-panel col-span-12 md:col-span-4 h-[300px] flex flex-col"><div class="flex-1" id="chart_ibov"></div></div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: VALUATION HUB (NOVA) -->
+        <div id="valuation-view" class="p-8 max-w-6xl mx-auto">
+            <div class="glass-panel p-8">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                    <h2 class="text-2xl font-black italic uppercase text-green-500">Fundamental Intelligence Hub</h2>
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <input type="text" id="v-ticker" placeholder="TICKER (EX: PETR4)" class="valuation-input w-full md:w-48 uppercase font-bold">
+                        <button onclick="window.open('https://statusinvest.com.br/acoes/' + document.getElementById('v-ticker').value, '_blank')" class="bg-blue-600 px-6 py-2 rounded-xl text-[10px] font-bold uppercase shrink-0">Status Invest <i class="fas fa-external-link-alt ml-1"></i></button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Preço Atual (R$)</label>
+                        <input type="number" id="v-preco" class="valuation-input" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-500 uppercase mb-2 block">LPA (Lucro p/ Ação)</label>
+                        <input type="number" id="v-lpa" class="valuation-input" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-500 uppercase mb-2 block">VPA (V. Patr. p/ Ação)</label>
+                        <input type="number" id="v-vpa" class="valuation-input" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Dividendos (R$ Ano)</label>
+                        <input type="number" id="v-div" class="valuation-input" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="result-card">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Preço Teto Bazin (6%)</p>
+                        <h3 class="text-3xl font-black italic" id="res-bazin">R$ 0,00</h3>
+                    </div>
+                    <div class="result-card border-purple-500/20">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Valor Justo Graham</p>
+                        <h3 class="text-3xl font-black italic" id="res-graham">R$ 0,00</h3>
+                    </div>
+                    <div class="result-card" id="margem-box">
+                        <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Margem de Segurança</p>
+                        <h3 class="text-3xl font-black italic" id="res-margem">0,00%</h3>
+                    </div>
+                </div>
+
+                <button onclick="calcularValuation()" class="w-full bg-green-600 hover:bg-green-500 py-4 rounded-xl font-black italic uppercase tracking-widest transition">Calcular Modelos de Valuation</button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: ACADEMY PLAYER -->
+        <div id="academy-view" class="p-8 max-w-6xl mx-auto">
+            <div class="glass-panel p-6">
+                <div class="video-aspect mb-6 flex items-center justify-center bg-black/40"><i class="fas fa-play-circle text-6xl text-blue-500 opacity-30"></i></div>
+                <h2 id="video-title" class="text-2xl font-black italic uppercase text-blue-500 mb-2">Módulo</h2>
+                <button class="bg-blue-600 px-6 py-3 rounded-xl font-bold text-xs uppercase">Concluir Aula</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        let currentTheme = 'dark';
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-br'); }, 1000);
+
+        function switchView(view, title = "") {
+            document.getElementById('terminal-view').style.display = view === 'terminal' ? 'block' : 'none';
+            document.getElementById('academy-view').style.display = view === 'academy' ? 'block' : 'none';
+            document.getElementById('valuation-view').style.display = view === 'valuation' ? 'block' : 'none';
+            document.getElementById('view-title').innerText = view === 'academy' ? "Academy / " + title : view === 'valuation' ? "Valuation Hub" : "Live Market Terminal";
+            if(view === 'academy') document.getElementById('video-title').innerText = title;
+            if(view === 'terminal') loadCharts();
+        }
+
+        function calcularValuation() {
+            const preco = parseFloat(document.getElementById('v-preco').value) || 0;
+            const lpa = parseFloat(document.getElementById('v-lpa').value) || 0;
+            const vpa = parseFloat(document.getElementById('v-vpa').value) || 0;
+            const dividendos = parseFloat(document.getElementById('v-div').value) || 0;
+
+            const bazin = dividendos / 0.06;
+            const graham = Math.sqrt(22.5 * lpa * vpa);
+            
+            // Margem de segurança baseada no menor valor justo
+            const menorPrecoJusto = Math.min(bazin > 0 ? bazin : graham, graham);
+            const margem = preco > 0 ? ((menorPrecoJusto / preco) - 1) * 100 : 0;
+
+            document.getElementById('res-bazin').innerText = `R$ ${bazin.toFixed(2)}`;
+            document.getElementById('res-graham').innerText = `R$ ${graham.toFixed(2)}`;
+            document.getElementById('res-margem').innerText = `${margem.toFixed(2)}%`;
+            
+            const box = document.getElementById('margem-box');
+            if(margem > 0) { box.style.borderColor = 'rgba(34, 197, 94, 0.4)'; box.style.color = '#4ade80'; }
+            else { box.style.borderColor = 'rgba(239, 68, 68, 0.4)'; box.style.color = '#f87171'; }
+        }
+
+        const createChart = (symbol, containerId) => {
+            new TradingView.widget({
+                "autosize": true, "symbol": symbol, "interval": "D", "timezone": "America/Sao_Paulo",
+                "theme": currentTheme, "style": "1", "locale": "br", "container_id": containerId, "hide_legend": true,
+            });
+        };
+
+        const loadCharts = () => {
+            createChart("TVC:GOLD", "chart_gold");
+            createChart("TVC:SILVER", "chart_silver");
+            createChart("TVC:USOIL", "chart_oil");
+            createChart("BMFBOVESPA:IBOV", "chart_ibov");
+        };
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-theme');
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            loadCharts();
+        }
+
+        async function fetchRSS() {
+            const container = document.getElementById('rss-feed');
+            try {
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.infomoney.com.br/feed/`);
+                const data = await response.json();
+                container.innerHTML = ''; 
+                data.items.slice(0, 8).forEach(item => {
+                    container.innerHTML += `<a href="${item.link}" target="_blank" class="block group border-b border-white/5 pb-4 transition"><span class="text-[8px] text-blue-400 font-bold uppercase">News Flow</span><h4 class="text-[11px] font-bold italic group-hover:text-blue-400 transition text-gray-300">"${item.title.toUpperCase()}"</h4></a>`;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        window.onload = () => { loadCharts(); fetchRSS(); };
+    </script>
+</body>
+</html>

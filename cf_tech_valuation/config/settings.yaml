@@ -1,0 +1,34 @@
+# Global Configuration Settings - CF Tech Valuation
+
+portfolio:
+  tickers:
+    - DIRR3
+    - PETR4
+    - VALE3
+    - WEGE3
+
+gemini:
+  model_name: "gemini-2.0-flash"
+  temperature: 0.3
+
+valuation:
+  # WACC assumptions
+  wacc:
+    taxa_livre_risco: 0.12       # Risk-free rate
+    premio_risco_mercado: 0.06   # Market risk premium
+    custo_divida: 0.115          # Pre-tax cost of debt
+    aliquota_imposto: 0.34       # Corporate tax rate
+    de_ratio: 0.15               # Debt-to-equity ratio
+    
+  # DCF assumptions
+  dcf:
+    anos_projecao: 5
+    perpetuidade_g: 0.025        # Perpetuity growth rate (dy variation)
+
+  # Monte Carlo assumptions
+  monte_carlo:
+    num_simulacoes: 10000
+    vso_media: 0.60
+    vso_std: 0.10
+    margem_ebit_media: 0.15
+    margem_ebit_std: 0.03
