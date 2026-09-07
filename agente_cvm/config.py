@@ -2,13 +2,14 @@ import os
 import openpyxl
 from dotenv import load_dotenv
 
-# Carregar variáveis do arquivo .env
-load_dotenv()
-
 # Caminhos do projeto
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(BASE_DIR, ".env")
+load_dotenv(dotenv_path)
+
 DB_PATH = os.path.join(BASE_DIR, "agente_cvm.db")
 EMPRESAS_XLSX = os.path.join(BASE_DIR, "empresas.xlsx")
+UNIVERSO_JSON = os.path.join(BASE_DIR, "empresas_universo.json")
 
 # Variáveis do Telegram e Gemini
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
@@ -36,11 +37,9 @@ def inicializar_empresas_xlsx():
         ws = wb.active
         ws.title = "Empresas"
         
-        # Cabeçalhos
         headers = ["TICKER", "CNPJ", "COD_CVM", "NOME"]
         ws.append(headers)
         
-        # Inserir dados
         for emp in EMPRESAS_PADRAO:
             ws.append([emp["TICKER"], emp["CNPJ"], emp["COD_CVM"], emp["NOME"]])
             
@@ -48,22 +47,52 @@ def inicializar_empresas_xlsx():
         wb.close()
 
 def carregar_empresas():
-    """Carrega a lista de empresas do excel empresas.xlsx."""
-    inicializar_empresas_xlsx()
-    
+    """
+    Carrega o catálogo completo de empresas brasileiras (680+ tickers da B3 e CVM).
+    Prioriza empresas_universo.json e faz fallback para empresas.xlsx.
+    """
+    import json
     empresas = []
+
+    if os.path.exists(UNIVERSO_JSON):
+        try:
+            with open(UNIVERSO_JSON, "r", encoding="utf-8") as f:
+                universo = json.load(f)
+                for ticker, data in universo.items():
+                    cnpj = str(data.get("cnpj", "")).strip()
+                    cod_cvm = str(data.get("cvm_code", "")).strip()
+                    nome = str(data.get("nome", "")).strip()
+                    setor = str(data.get("setor", "")).strip()
+                    
+                    cnpj_limpo = "".join(filter(str.isdigit, cnpj))
+                    cvm_limpo = "".join(filter(str.isdigit, cod_cvm))
+                    
+                    empresas.append({
+                        "ticker": ticker.upper(),
+                        "cnpj": cnpj,
+                        "cnpj_limpo": cnpj_limpo,
+                        "cvm_code": cod_cvm,
+                        "cvm_limpo": cvm_limpo,
+                        "nome": nome,
+                        "setor": setor
+                    })
+            if empresas:
+                return sorted(empresas, key=lambda x: x["ticker"])
+        except Exception as e:
+            print(f"[Config] Aviso ao carregar {UNIVERSO_JSON}: {e}")
+
+    # Fallback para empresas.xlsx
+    inicializar_empresas_xlsx()
     try:
         wb = openpyxl.load_workbook(EMPRESAS_XLSX, data_only=True)
         ws = wb.active
         
-        # Ler linhas
         header = None
         for row in ws.iter_rows(values_only=True):
             if not header:
                 header = [str(cell).upper().strip() for cell in row]
                 continue
             
-            # Mapear dados
             if not any(row):
                 continue
                 
@@ -74,9 +103,7 @@ def carregar_empresas():
             nome = str(data.get("NOME", "")).strip()
             
             if ticker and (cnpj or cod_cvm):
-                # Limpar CNPJ de caracteres não numéricos para comparação
                 cnpj_limpo = "".join(filter(str.isdigit, cnpj))
-                # Limpar código CVM de caracteres não numéricos
                 cvm_limpo = "".join(filter(str.isdigit, cod_cvm))
                 
                 empresas.append({
@@ -85,10 +112,37 @@ def carregar_empresas():
                     "cnpj_limpo": cnpj_limpo,
                     "cvm_code": cod_cvm,
                     "cvm_limpo": cvm_limpo,
-                    "nome": nome
+                    "nome": nome,
+                    "setor": "Geral"
                 })
         wb.close()
     except Exception as e:
         print(f"[Config] Erro ao carregar empresas.xlsx: {e}")
         
     return empresas
+
+def buscar_empresa_por_codigo(termo: str):
+    """Localiza os dados cadastrais de uma empresa por ticker, código CVM ou nome."""
+    if not termo:
+        return None
+    termo_clean = termo.strip().upper()
+    termo_num = "".join(filter(str.isdigit, termo_clean))
+    
+    todas = carregar_empresas()
+    # 1. Match exato por ticker
+    for emp in todas:
+        if emp["ticker"] == termo_clean:
+            return emp
+            
+    # 2. Match por código CVM
+    if termo_num:
+        for emp in todas:
+            if emp["cvm_limpo"] and int(emp["cvm_limpo"]) == int(termo_num):
+                return emp
+
+    # 3. Match por nome
+    for emp in todas:
+        if termo_clean in emp["nome"].upper() or emp["nome"].upper() in termo_clean:
+            return emp
+            
+    return None

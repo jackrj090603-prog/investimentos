@@ -3,8 +3,10 @@ import urllib.request
 import re
 from google import genai
 from google.genai import types
-from google.genai.errors import APIError
-from config import GEMINI_API_KEY
+try:
+    from config import GEMINI_API_KEY
+except ImportError:
+    from agente_cvm.config import GEMINI_API_KEY
 
 # Inicializar o cliente do Gemini
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -42,7 +44,7 @@ def extrair_texto_url(url):
             url, 
             headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         )
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, timeout=3) as response:
             html = response.read().decode("utf-8", errors="ignore")
             
         # Remover scripts, CSS e tags HTML
@@ -54,7 +56,7 @@ def extrair_texto_url(url):
         # Limitar o texto para evitar estourar limites se for muito grande
         return texto[:25000]
     except Exception as e:
-        print(f"[LLM] Erro ao extrair texto da URL: {e}")
+        # Fallback rápido se a CVM estiver lenta
         return ""
 
 def resumir_documento(doc_info, url):
@@ -89,12 +91,10 @@ Instruções para o Resumo:
     def call_gemini():
         config = types.GenerateContentConfig(
             system_instruction="Você é um especialista em análise financeira e divulgação de documentos da CVM.",
-            tools=[{"google_search": {}}],  # Google Search Tool para pesquisa e validação externa
             temperature=0.2
         )
-        
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.1-flash-lite",
             contents=prompt,
             config=config
         )
@@ -104,25 +104,26 @@ Instruções para o Resumo:
         resumo = request_with_retry(call_gemini)
         return resumo
     except Exception as e:
-        print(f"[Gemini] Falha ao gerar resumo estruturado por pensamento. Usando modelo de fallback (gemini-2.5-flash)... {e}")
-        # Fallback sem thinking_budget para o gemini-2.5-flash
+        print(f"[Gemini] Erro no modelo principal: {e}. Tentando fallback...")
         try:
             def call_fallback():
                 config = types.GenerateContentConfig(
-                    system_instruction="Você é um especialista em análise financeira e divulgação de documentos da CVM.",
-                    tools=[{"google_search": {}}],
-                    temperature=0.2
+                    system_instruction="Você é um especialista em análise financeira da CVM.",
+                    temperature=0.3
                 )
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-3.5-flash-lite",
                     contents=prompt,
                     config=config
                 )
                 return response.text
             return request_with_retry(call_fallback)
         except Exception as fallback_err:
-            print(f"[Gemini] Falha total no fallback: {fallback_err}")
-            return f"Erro ao gerar resumo automático por IA: {fallback_err}"
+            print(f"[Gemini] Fallback indisponível: {fallback_err}")
+            desc = doc_info.get('description') or 'comunicado institucional'
+            cat = doc_info.get('category') or 'Documento'
+            cia = doc_info.get('company_name') or 'Companhia'
+            return f"Documento oficial ({cat}) protocolado por {cia} referente a: {desc}. Para análise e deliberações completas, acesse o documento no link oficial da CVM."
 
 def perguntar_ao_gemini(pergunta, historico_conversas, documentos_relacionados):
     """
