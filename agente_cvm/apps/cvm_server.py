@@ -14,6 +14,7 @@ if AGENTE_DIR not in sys.path:
 import storage
 import config
 import llm
+import whatsapp_bot
 
 PORT = 8001
 
@@ -60,6 +61,13 @@ class CVMHandler(SimpleHTTPRequestHandler):
             mes = params.get("mes", [""])[0].strip()
             docs = storage.buscar_documentos_por_termo(q, mes=mes, limit=160)
             self.wfile.write(json.dumps(docs).encode("utf-8"))
+
+        elif parsed.path == "/api/whatsapp/listar":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            alertas = storage.listar_alertas_whatsapp()
+            self.wfile.write(json.dumps(alertas).encode("utf-8"))
             
         elif parsed.path == "/api/resumir":
             link = params.get("link", [""])[0].strip()
@@ -110,6 +118,70 @@ class CVMHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.end_headers()
             self.wfile.write(json.dumps({"status": "ok", "resumo": resumo}).encode("utf-8"))
+            
+        else:
+            self.send_response(404)
+            self.end_headers()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        content_length = int(self.headers.get('Content-Length', 0))
+        post_data = self.rfile.read(content_length).decode('utf-8') if content_length > 0 else "{}"
+        
+        try:
+            data = json.loads(post_data)
+        except Exception:
+            data = {}
+            
+        if parsed.path == "/api/whatsapp/cadastrar":
+            telefone = data.get("telefone", "").strip()
+            ticker = data.get("ticker", "TODAS").strip().upper() or "TODAS"
+            nome = data.get("nome", "").strip()
+            apenas_fr = 1 if data.get("apenas_fr", True) else 0
+            
+            if not telefone:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b'{"error": "Telefone obrigatorio"}')
+                return
+                
+            res = storage.cadastrar_alerta_whatsapp(telefone, ticker, nome, apenas_fr)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "registro": res}).encode("utf-8"))
+            
+        elif parsed.path == "/api/whatsapp/remover":
+            alerta_id = data.get("id")
+            if not alerta_id:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b'{"error": "ID obrigatorio"}')
+                return
+                
+            storage.remover_alerta_whatsapp(alerta_id)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(b'{"status": "ok"}')
+            
+        elif parsed.path == "/api/whatsapp/testar":
+            telefone = data.get("telefone", "").strip()
+            ticker = data.get("ticker", "MDIA3").strip().upper() or "MDIA3"
+            if not telefone:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(b'{"error": "Telefone obrigatorio"}')
+                return
+                
+            res_envio = whatsapp_bot.enviar_alerta_teste(telefone, ticker)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok", "resultado": res_envio}).encode("utf-8"))
             
         else:
             self.send_response(404)
@@ -591,23 +663,26 @@ class CVMHandler(SimpleHTTPRequestHandler):
             border-radius: 3px;
         }
 
-        /* Grid de 2 Colunas (Não fica todo na vertical!) */
+        /* Layout de 1 Coluna Dentro do Viewport de Rolagem (Conforme Solicitado) */
         .docs-grid-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 14px;
+            width: 100%;
         }
 
-        /* Cards em Dimensão Menor */
+        /* Cards em Dimensão Menor e Largura Completa */
         .doc-item-compact {
             border: 1px solid var(--c-hairline);
             background: #0d0d11;
             border-radius: 6px;
-            padding: 15px 18px;
+            padding: 16px 22px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: all 0.2s;
+            width: 100%;
+            box-sizing: border-box;
         }
         .doc-item-compact:hover {
             border-color: rgba(140, 121, 192, 0.45);
@@ -810,6 +885,298 @@ class CVMHandler(SimpleHTTPRequestHandler):
             text-decoration: underline;
         }
 
+        /* ================= BANNER E MODAL WHATSAPP ================= */
+        .btn-wpp-nav {
+            background: rgba(37, 211, 102, 0.12) !important;
+            border-color: rgba(37, 211, 102, 0.45) !important;
+            color: #4ade80 !important;
+            font-weight: 600 !important;
+        }
+        .btn-wpp-nav:hover {
+            background: rgba(37, 211, 102, 0.28) !important;
+            border-color: #4ade80 !important;
+            color: #ffffff !important;
+        }
+
+        .wpp-promo-banner {
+            border: 1px solid rgba(37, 211, 102, 0.35);
+            background: linear-gradient(135deg, rgba(20, 83, 45, 0.22) 0%, rgba(13, 13, 17, 0.95) 100%);
+            border-radius: 8px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .wpp-promo-banner:hover {
+            border-color: rgba(74, 222, 128, 0.65);
+            transform: translateY(-1px);
+        }
+        .wpp-promo-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .wpp-promo-icon {
+            font-size: 24px;
+            color: #4ade80;
+            background: rgba(37, 211, 102, 0.15);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .wpp-promo-title {
+            font-family: var(--font-title);
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--c-papel);
+            letter-spacing: 0.04em;
+        }
+        .wpp-promo-desc {
+            font-size: 12.5px;
+            color: var(--c-grafite-light);
+            margin-top: 2px;
+        }
+        .btn-wpp-action {
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s;
+        }
+        .btn-wpp-action:hover {
+            background: #22c55e;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: #101015;
+            border: 1px solid var(--c-roxo-fume);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            max-width: 580px;
+            width: 100%;
+            overflow: hidden;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            background: rgba(59, 7, 100, 0.25);
+            border-bottom: 1px solid var(--c-hairline);
+            padding: 16px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-family: var(--font-title);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--c-papel);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--c-grafite-light);
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close-btn:hover {
+            color: #ffffff;
+        }
+        .modal-body {
+            padding: 22px;
+        }
+        .wpp-form-group {
+            margin-bottom: 16px;
+        }
+        .wpp-form-label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.14em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .wpp-input {
+            width: 100%;
+            background: #08080a;
+            border: 1px solid var(--c-hairline);
+            color: var(--c-papel);
+            padding: 10px 14px;
+            font-family: var(--font-body);
+            font-size: 13.5px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .wpp-input:focus {
+            border-color: #22c55e;
+        }
+        .wpp-checkbox-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--c-papel);
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .wpp-checkbox-wrap input {
+            accent-color: #22c55e;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .wpp-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+        .btn-wpp-save {
+            flex: 1;
+            background: #16a34a;
+            color: #ffffff;
+            border: none;
+            padding: 11px 16px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-wpp-save:hover {
+            background: #22c55e;
+        }
+        .btn-wpp-test {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--c-papel);
+            border: 1px solid var(--c-hairline);
+            padding: 11px 16px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-wpp-test:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--c-roxo-fume);
+        }
+        .wpp-alert-box {
+            margin-top: 16px;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 12.5px;
+            line-height: 1.5;
+            display: none;
+        }
+        .wpp-alert-box.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+        .wpp-alert-box.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+        .wpp-registered-list {
+            margin-top: 20px;
+            border-top: 1px solid var(--c-hairline);
+            padding-top: 14px;
+        }
+        .wpp-registered-title {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .wpp-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--c-hairline);
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .wpp-item-tag {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--c-roxo-fume);
+            margin-left: 8px;
+        }
+        .btn-wpp-del {
+            background: none;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+        .btn-wpp-del:hover {
+            color: #ef4444;
+        }
+
         /* ================= RODAPÉ OFICIAL CF TECH (IMAGEM 2) ================= */
         .footer-system {
             margin-top: 40px;
@@ -963,6 +1330,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             </div>
 
             <div class="header-actions">
+                <button onclick="abrirModalWpp()" class="btn-top btn-wpp-nav"><i class="fab fa-whatsapp"></i> ALERTAS WHATSAPP</button>
                 <a href="http://localhost:8000" class="btn-top"><i class="fas fa-arrow-left"></i> FINANCE HUB</a>
                 <button onclick="carregarDocs()" class="btn-top"><i class="fas fa-rotate"></i> ATUALIZAR</button>
             </div>
@@ -1069,7 +1437,19 @@ class CVMHandler(SimpleHTTPRequestHandler):
             </div>
         </div>
 
-        <!-- VIEWPORT COM OPÇÃO DE DESCER (SCROLL INTERNO & CARDS EM GRID COMPACTO) -->
+        <!-- Banner de Chamada para Alertas no WhatsApp -->
+        <div class="wpp-promo-banner" onclick="abrirModalWpp()">
+            <div class="wpp-promo-left">
+                <div class="wpp-promo-icon"><i class="fab fa-whatsapp"></i></div>
+                <div>
+                    <div class="wpp-promo-title">ALERTAS NO SEU WHATSAPP EM TEMPO REAL</div>
+                    <div class="wpp-promo-desc">Vincule seu número e receba comunicados da sua ação com parecer executivo do Gemini assim que divulgados na CVM.</div>
+                </div>
+            </div>
+            <button class="btn-wpp-action"><i class="fas fa-bell"></i> VINCULAR MEU WHATSAPP</button>
+        </div>
+
+        <!-- VIEWPORT COM OPÇÃO DE DESCER (SCROLL INTERNO COM 1 COLUNA AMPLA) -->
         <div class="docs-viewport-card">
             <div class="docs-viewport-header">
                 <div>
@@ -1132,6 +1512,59 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 <div>EDIÇÃO 2026 &bull; USO INTERNO</div>
             </div>
         </footer>
+    </div>
+
+    <!-- Modal de Vinculação WhatsApp -->
+    <div id="modal-wpp" class="modal-backdrop" onclick="fecharModalWppOverlay(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fab fa-whatsapp" style="color:#22c55e;"></i> Alertas CVM no WhatsApp</h3>
+                <button class="modal-close-btn" onclick="fecharModalWpp()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: var(--c-grafite-light); margin-bottom: 18px; line-height: 1.55;">
+                    Vincule seu número para receber os comunicados de uma ação (ex: <strong>MDIA3</strong>, <strong>PETR4</strong>, <strong>VALE3</strong>) ou de <strong>TODAS</strong> com o parecer executivo do Gemini diretamente no WhatsApp assim que protocolados na CVM.
+                </p>
+
+                <div class="wpp-form-group">
+                    <label class="wpp-form-label">Seu Número de WhatsApp (com DDD)</label>
+                    <input type="text" id="wpp-input-phone" class="wpp-input" placeholder="(85) 99999-9999" maxlength="20">
+                </div>
+
+                <div class="wpp-form-group">
+                    <label class="wpp-form-label">Ticker da Ação de Interesse</label>
+                    <input type="text" id="wpp-input-ticker" class="wpp-input" placeholder="Ex: MDIA3, PETR4, VALE3 ou TODAS" value="MDIA3">
+                </div>
+
+                <div class="wpp-form-group">
+                    <label class="wpp-form-label">Seu Nome / Apelido (Opcional)</label>
+                    <input type="text" id="wpp-input-nome" class="wpp-input" placeholder="Ex: Investidor">
+                </div>
+
+                <label class="wpp-checkbox-wrap">
+                    <input type="checkbox" id="wpp-input-fr-only" checked>
+                    <span>Receber prioritariamente Fatos Relevantes e Comunicados de impacto</span>
+                </label>
+
+                <div id="wpp-feedback" class="wpp-alert-box"></div>
+
+                <div class="wpp-modal-actions">
+                    <button class="btn-wpp-save" onclick="salvarInscricaoWpp()">
+                        <i class="fas fa-check-circle"></i> ATIVAR ALERTA
+                    </button>
+                    <button class="btn-wpp-test" onclick="testarEnvioWpp()">
+                        <i class="fas fa-paper-plane"></i> TESTAR NOTIFICAÇÃO
+                    </button>
+                </div>
+
+                <div class="wpp-registered-list" id="wpp-list-container">
+                    <div class="wpp-registered-title">Números Conectados para Alertas</div>
+                    <div id="wpp-active-list">
+                        <div style="font-size:12px; color:var(--c-grafite-light); opacity:0.6;">Carregando números...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1280,8 +1713,33 @@ class CVMHandler(SimpleHTTPRequestHandler):
             text = text.replace(/^Como Analista de RI[^:]*:\s*/i, '');
             text = text.replace(/^Prezado\(a\)[^:]*:\s*/i, '');
 
-            // Separar seções por cabeçalhos ###
-            const parts = text.split(/###\s*\**([^*]+)\**/);
+            // Agrupar seções por linhas com marcadores ### (evita quebra de negrito e asteriscos)
+            const lines = text.split('\n');
+            const sections = [];
+            let currentHeader = '';
+            let currentBodyLines = [];
+
+            for (let rawLine of lines) {
+                const trimmed = rawLine.trim();
+                if (trimmed.startsWith('###')) {
+                    if (currentHeader || currentBodyLines.length > 0) {
+                        sections.push({
+                            header: currentHeader,
+                            body: currentBodyLines.join('\n').trim()
+                        });
+                        currentBodyLines = [];
+                    }
+                    currentHeader = trimmed.replace(/^###\s*/, '').replace(/[*#]/g, '').trim();
+                } else {
+                    currentBodyLines.push(rawLine);
+                }
+            }
+            if (currentHeader || currentBodyLines.length > 0) {
+                sections.push({
+                    header: currentHeader,
+                    body: currentBodyLines.join('\n').trim()
+                });
+            }
 
             let html = `
             <div class="ai-summary-compact">
@@ -1294,52 +1752,55 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 </div>
             `;
 
-            if (parts.length > 1) {
-                const intro = parts[0].trim();
-                if (intro && intro.length > 15) {
-                    const introFmt = formatarNegrito(intro);
-                    html += `<div class="summary-content-intro">${introFmt}</div>`;
+            for (let sec of sections) {
+                const header = sec.header;
+                const body = sec.body;
+                if (!header && !body) continue;
+
+                if (!header && body) {
+                    html += `<div class="summary-content-intro">${formatarNegrito(body)}</div>`;
+                    continue;
                 }
 
-                for (let i = 1; i < parts.length; i += 2) {
-                    const header = (parts[i] || '').replace(/[*#]/g, '').trim();
-                    const body = (parts[i + 1] || '').trim();
+                const isAnalysis = header.toLowerCase().includes('investidor') || 
+                                   header.toLowerCase().includes('análise') || 
+                                   header.toLowerCase().includes('impacto');
 
-                    const isAnalysis = header.toLowerCase().includes('investidor') || header.toLowerCase().includes('análise') || header.toLowerCase().includes('impacto');
+                if (isAnalysis) {
+                    const bodyFmt = formatarNegrito(body);
+                    html += `
+                    <div class="summary-analysis-callout">
+                        <div class="analysis-label-mini"><i class="fas fa-compass"></i> ${header.toUpperCase()}</div>
+                        <div>${bodyFmt}</div>
+                    </div>
+                    `;
+                } else {
+                    html += `
+                    <div class="summary-section-label" style="font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.16em; color:var(--c-roxo-fume); margin:6px 0 4px; text-transform:uppercase;">
+                        <i class="fas fa-angle-right"></i> ${header.toUpperCase()}
+                    </div>
+                    <div class="summary-bullets-box">
+                    `;
+                    const bLines = body.split('\n');
+                    for (let bLine of bLines) {
+                        bLine = bLine.trim();
+                        if (!bLine) continue;
 
-                    if (isAnalysis) {
-                        const bodyFmt = formatarNegrito(body);
-                        html += `
-                        <div class="summary-analysis-callout">
-                            <div class="analysis-label-mini"><i class="fas fa-compass"></i> ${header.toUpperCase()}</div>
-                            <div>${bodyFmt}</div>
-                        </div>
-                        `;
-                    } else {
-                        html += `<div class="summary-bullets-box">`;
-                        const lines = body.split('\n');
-                        for (let line of lines) {
-                            line = line.trim();
-                            if (!line) continue;
-
-                            if (line.startsWith('*') || line.startsWith('-')) {
-                                let bullet = line.replace(/^[\*\-]\s*/, '').trim();
-                                bullet = formatarNegrito(bullet);
-                                html += `
-                                <div class="summary-bullet-row">
-                                    <span class="bullet-dot-mini"></span>
-                                    <div>${bullet}</div>
-                                </div>
-                                `;
-                            } else {
-                                html += `<div class="summary-content-intro">${formatarNegrito(line)}</div>`;
-                            }
+                        if (bLine.startsWith('*') || bLine.startsWith('-')) {
+                            let bullet = bLine.replace(/^[\*\-]\s*/, '').trim();
+                            bullet = formatarNegrito(bullet);
+                            html += `
+                            <div class="summary-bullet-row">
+                                <span class="bullet-dot-mini"></span>
+                                <div>${bullet}</div>
+                            </div>
+                            `;
+                        } else {
+                            html += `<div class="summary-content-intro">${formatarNegrito(bLine)}</div>`;
                         }
-                        html += `</div>`;
                     }
+                    html += `</div>`;
                 }
-            } else {
-                html += `<div class="summary-content-intro">${formatarNegrito(text)}</div>`;
             }
 
             html += `</div>`;
@@ -1347,9 +1808,11 @@ class CVMHandler(SimpleHTTPRequestHandler):
         }
 
         function formatarNegrito(str) {
+            if (!str) return '';
             return str
                 .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+                .replace(/\*([^\*]+)\*/g, '<em>$1</em>')
+                .replace(/\*\*/g, '');
         }
 
         async function gerarResumo(link, ticker, btnEl) {
@@ -1422,6 +1885,145 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 `;
             }
             listEl.innerHTML = html;
+        }
+
+        // ================= FUNÇÕES WHATSAPP =================
+        function abrirModalWpp() {
+            document.getElementById('modal-wpp').style.display = 'flex';
+            carregarInscritosWpp();
+            const searchVal = document.getElementById('input-search').value.trim().toUpperCase();
+            if (searchVal && searchVal.length <= 6 && !searchVal.includes(' ')) {
+                document.getElementById('wpp-input-ticker').value = searchVal;
+            }
+        }
+
+        function fecharModalWpp() {
+            document.getElementById('modal-wpp').style.display = 'none';
+            const feedback = document.getElementById('wpp-feedback');
+            feedback.className = 'wpp-alert-box';
+            feedback.style.display = 'none';
+        }
+
+        function fecharModalWppOverlay(e) {
+            if (e.target.id === 'modal-wpp') {
+                fecharModalWpp();
+            }
+        }
+
+        async function carregarInscritosWpp() {
+            const listEl = document.getElementById('wpp-active-list');
+            try {
+                const res = await fetch('/api/whatsapp/listar');
+                const inscritos = await res.json();
+                if (!inscritos || inscritos.length === 0) {
+                    listEl.innerHTML = '<div style="font-size:12px; color:var(--c-grafite-light); opacity:0.6;">Nenhum número cadastrado ainda. Cadastre acima para receber.</div>';
+                    return;
+                }
+                let html = '';
+                for (let item of inscritos) {
+                    html += `
+                    <div class="wpp-item-row">
+                        <div>
+                            <span>+${item.telefone}</span>
+                            <span class="wpp-item-tag">[ ${item.ticker} ]</span>
+                            ${item.nome ? `<span style="color:var(--c-grafite-light); font-size:11px; margin-left:6px;">(${item.nome})</span>` : ''}
+                        </div>
+                        <button class="btn-wpp-del" onclick="removerInscricaoWpp(${item.id})" title="Desativar Alerta">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </div>
+                    `;
+                }
+                listEl.innerHTML = html;
+            } catch (err) {
+                listEl.innerHTML = '<div style="font-size:12px; color:#f87171;">Erro ao carregar lista.</div>';
+            }
+        }
+
+        async function salvarInscricaoWpp() {
+            const phone = document.getElementById('wpp-input-phone').value.trim();
+            const ticker = document.getElementById('wpp-input-ticker').value.trim().toUpperCase() || 'TODAS';
+            const nome = document.getElementById('wpp-input-nome').value.trim();
+            const apenasFr = document.getElementById('wpp-input-fr-only').checked;
+            const feedback = document.getElementById('wpp-feedback');
+
+            if (!phone) {
+                feedback.className = 'wpp-alert-box error';
+                feedback.innerText = 'Por favor, informe seu número de WhatsApp com DDD.';
+                return;
+            }
+
+            feedback.className = 'wpp-alert-box';
+            feedback.style.display = 'block';
+            feedback.innerText = 'Conectando número ao sistema...';
+
+            try {
+                const res = await fetch('/api/whatsapp/cadastrar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telefone: phone, ticker: ticker, nome: nome, apenas_fr: apenasFr })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    feedback.className = 'wpp-alert-box success';
+                    feedback.innerHTML = `<strong>Sucesso!</strong> WhatsApp vinculado para receber alertas de <strong>${ticker}</strong>.`;
+                    carregarInscritosWpp();
+                } else {
+                    feedback.className = 'wpp-alert-box error';
+                    feedback.innerText = data.error || 'Erro ao cadastrar número.';
+                }
+            } catch (err) {
+                feedback.className = 'wpp-alert-box error';
+                feedback.innerText = 'Falha de comunicação com o servidor.';
+            }
+        }
+
+        async function testarEnvioWpp() {
+            const phone = document.getElementById('wpp-input-phone').value.trim();
+            const ticker = document.getElementById('wpp-input-ticker').value.trim().toUpperCase() || 'MDIA3';
+            const feedback = document.getElementById('wpp-feedback');
+
+            if (!phone) {
+                feedback.className = 'wpp-alert-box error';
+                feedback.innerText = 'Informe um número para enviar o teste.';
+                return;
+            }
+
+            feedback.className = 'wpp-alert-box';
+            feedback.style.display = 'block';
+            feedback.innerText = 'Disparando notificação de teste CVM...';
+
+            try {
+                const res = await fetch('/api/whatsapp/testar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ telefone: phone, ticker: ticker })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    feedback.className = 'wpp-alert-box success';
+                    feedback.innerHTML = `<strong>Teste gerado com sucesso!</strong> Mensagem formatada enviada para o canal de +${phone} (${ticker}).`;
+                } else {
+                    feedback.className = 'wpp-alert-box error';
+                    feedback.innerText = data.error || 'Erro no envio do teste.';
+                }
+            } catch (err) {
+                feedback.className = 'wpp-alert-box error';
+                feedback.innerText = 'Falha ao testar envio.';
+            }
+        }
+
+        async function removerInscricaoWpp(id) {
+            try {
+                await fetch('/api/whatsapp/remover', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: id })
+                });
+                carregarInscritosWpp();
+            } catch (err) {
+                alert('Erro ao remover inscrição.');
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {

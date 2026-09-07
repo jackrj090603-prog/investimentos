@@ -86,6 +86,15 @@ def executar_monitoramento():
             print(f"[Monitor] Enviando alerta Telegram para #{ticker}...")
             telegram_bot.send_message(TELEGRAM_CHAT_ID_ALERTAS, alert_text)
             
+            # 6. Despachar alerta para usuários inscritos no WhatsApp
+            try:
+                import whatsapp_bot
+                total_wpp = whatsapp_bot.disparar_alerta_para_inscritos(doc, resumo)
+                if total_wpp > 0:
+                    print(f"[Monitor] {total_wpp} alertas enviados via WhatsApp para #{ticker}.")
+            except Exception as e_wpp:
+                print(f"[Monitor] Erro ao despachar WhatsApp: {e_wpp}")
+            
             # Pequena pausa para evitar sobrecarga no bot e rate-limits
             time.sleep(2)
             

@@ -91,6 +91,21 @@ def init_db():
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+    # Tabela de inscrições de alertas WhatsApp
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS whatsapp_alertas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        telefone TEXT NOT NULL,
+        ticker TEXT NOT NULL,
+        nome TEXT DEFAULT '',
+        apenas_fr INTEGER DEFAULT 1,
+        ativo INTEGER DEFAULT 1,
+        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_wpp_ticker ON whatsapp_alertas(ticker)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_wpp_telefone ON whatsapp_alertas(telefone)")
     
     conn.commit()
     conn.close()
@@ -411,4 +426,80 @@ def get_metricas_completas():
         "total_fr": total_fr or 2480,
         "total_empresas": 684
     }
+
+def cadastrar_alerta_whatsapp(telefone, ticker, nome="", apenas_fr=1):
+    """Cadastra ou reativa uma inscrição de alerta de WhatsApp para um ticker ou todas."""
+    init_db()
+    conn = get_connection()
+    cursor = conn.cursor()
+    # Limpar telefone mantendo apenas dígitos
+    tel_clean = "".join(filter(str.isdigit, str(telefone)))
+    if not tel_clean.startswith("55") and len(tel_clean) in (10, 11):
+        tel_clean = f"55{tel_clean}"
+    
+    tck = ticker.strip().upper() if ticker else "TODAS"
+    
+    # Verificar se já existe
+    cursor.execute("SELECT id FROM whatsapp_alertas WHERE telefone = ? AND ticker = ?", (tel_clean, tck))
+    row = cursor.fetchone()
+    if row:
+        cursor.execute("UPDATE whatsapp_alertas SET ativo = 1, nome = ?, apenas_fr = ? WHERE id = ?",
+                       (nome, apenas_fr, row["id"]))
+        w_id = row["id"]
+    else:
+        cursor.execute("""
+            INSERT INTO whatsapp_alertas (telefone, ticker, nome, apenas_fr, ativo)
+            VALUES (?, ?, ?, ?, 1)
+        """, (tel_clean, tck, nome, apenas_fr))
+        w_id = cursor.lastrowid
+        
+    conn.commit()
+    conn.close()
+    return {"id": w_id, "telefone": tel_clean, "ticker": tck, "status": "ativo"}
+
+def listar_alertas_whatsapp():
+    """Retorna lista de todas as inscrições ativas no WhatsApp."""
+    init_db()
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM whatsapp_alertas WHERE ativo = 1 ORDER BY id DESC")
+    rows = cursor.fetchall()
+    res = []
+    for r in rows:
+        res.append({
+            "id": r["id"],
+            "telefone": r["telefone"],
+            "ticker": r["ticker"],
+            "nome": r["nome"],
+            "apenas_fr": r["apenas_fr"],
+            "ativo": r["ativo"],
+            "criado_em": r["criado_em"]
+        })
+    conn.close()
+    return res
+
+def remover_alerta_whatsapp(alerta_id):
+    """Desativa ou remove uma inscrição de alerta."""
+    init_db()
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE whatsapp_alertas SET ativo = 0 WHERE id = ?", (alerta_id,))
+    conn.commit()
+    conn.close()
+    return True
+
+def obter_inscritos_whatsapp_por_ticker(ticker):
+    """Retorna telefones cadastrados para receber notificações deste ticker ou de TODAS."""
+    init_db()
+    conn = get_connection()
+    cursor = conn.cursor()
+    tck = ticker.strip().upper()
+    cursor.execute("""
+        SELECT telefone, apenas_fr, nome FROM whatsapp_alertas
+        WHERE ativo = 1 AND (ticker = ? OR ticker = 'TODAS')
+    """, (tck,))
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"telefone": r["telefone"], "apenas_fr": r["apenas_fr"], "nome": r["nome"]} for r in rows]
+
 
