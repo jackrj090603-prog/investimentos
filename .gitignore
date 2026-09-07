@@ -37,6 +37,7 @@ data/raw/dfp_*
 data/raw/itr_*
 Kenny/
 *.log
+agente_cvm/dados_cvm/
 
 # Arquivos de sistema operacional
 .DS_Store

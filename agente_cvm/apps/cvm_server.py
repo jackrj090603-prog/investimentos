@@ -28,7 +28,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(self.render_cvm_dashboard().encode("utf-8"))
             
-        elif parsed.path == "/LOGO_CF.png":
+        elif parsed.path in ["/LOGO_CF_TECH.png", "/LOGO_CF.png", "/logo.png"]:
             self.serve_logo()
             
         elif parsed.path == "/health":
@@ -57,11 +57,8 @@ class CVMHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             
             q = params.get("q", [""])[0].strip()
-            if q:
-                docs = storage.buscar_documentos_por_termo(q, limit=120)
-            else:
-                docs = storage.get_todos_documentos(limit=120)
-                
+            mes = params.get("mes", [""])[0].strip()
+            docs = storage.buscar_documentos_por_termo(q, mes=mes, limit=160)
             self.wfile.write(json.dumps(docs).encode("utf-8"))
             
         elif parsed.path == "/api/resumir":
@@ -120,6 +117,9 @@ class CVMHandler(SimpleHTTPRequestHandler):
 
     def serve_logo(self):
         paths_to_try = [
+            os.path.join(AGENTE_DIR, "LOGO_CF_TECH.png"),
+            os.path.join(PROJECT_DIR, "LOGO_CF_TECH.png"),
+            os.path.join(BASE_DIR, "LOGO_CF_TECH.png"),
             os.path.join(PROJECT_DIR, "Mira", "LOGO_CF.png"),
             os.path.join(PROJECT_DIR, "LOGO_CF.png"),
             os.path.join(AGENTE_DIR, "LOGO_CF.png")
@@ -141,7 +141,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CF TECH — CVM Intelligence & Pareceres de RI | Ceará Finance</title>
+    <title>CF TECH — Fatos Relevantes CVM | Ceará Finance</title>
     <!-- Tipografia Oficial Manual de Marca CF Tech v2 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,11 +162,6 @@ class CVMHandler(SimpleHTTPRequestHandler):
             --c-card-bg: #111115;
             --c-card-hover: #15151B;
             --c-summary-bg: #0D0C13;
-            
-            /* Status */
-            --status-pos: #22c55e;
-            --status-neu: #8C79C0;
-            --status-risk: #f43f5e;
             
             /* Fontes */
             --font-title: 'Familjen Grotesk', sans-serif;
@@ -238,9 +233,9 @@ class CVMHandler(SimpleHTTPRequestHandler):
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 22px 0;
+            padding: 20px 0;
             border-bottom: 1px solid var(--c-hairline);
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .brand-lockup {
@@ -248,53 +243,11 @@ class CVMHandler(SimpleHTTPRequestHandler):
             align-items: center;
             gap: 16px;
         }
-
-        /* Touro entre Colchetes (Marca Oficial) */
-        .cf-mark-brackets {
-            display: flex;
-            align-items: center;
-            background: rgba(59, 7, 100, 0.25);
-            border: 1px solid rgba(140, 121, 192, 0.35);
-            padding: 6px 10px;
-            border-radius: 8px;
-            gap: 4px;
-        }
-        .bracket {
-            font-family: var(--font-mono);
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--c-roxo-fume);
-            line-height: 1;
-        }
-        .bull-icon-svg {
-            width: 26px;
-            height: 26px;
-            fill: var(--c-papel);
+        .logo-cf-banner {
+            height: 46px;
+            max-width: 250px;
+            object-fit: contain;
             display: block;
-        }
-        
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .brand-title {
-            font-family: var(--font-title);
-            font-weight: 600;
-            font-size: 22px;
-            letter-spacing: -0.02em;
-            line-height: 1;
-            color: var(--c-papel);
-        }
-        .brand-title span {
-            color: var(--c-roxo-fume);
-        }
-        .brand-sub {
-            font-family: var(--font-mono);
-            font-size: 9.5px;
-            letter-spacing: 0.22em;
-            color: var(--c-grafite-light);
-            text-transform: uppercase;
         }
 
         .header-actions {
@@ -326,32 +279,32 @@ class CVMHandler(SimpleHTTPRequestHandler):
 
         /* ================= HERO SECTION ================= */
         .hero-section {
-            padding: 20px 0 35px;
+            padding: 15px 0 30px;
             border-bottom: 1px solid var(--c-hairline);
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
         .hero-tag {
             font-family: var(--font-mono);
             font-size: 11px;
             letter-spacing: 0.24em;
             color: var(--c-roxo-fume);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             text-transform: uppercase;
         }
         .hero-title {
             font-family: var(--font-title);
             font-weight: 600;
-            font-size: 52px;
+            font-size: 48px;
             line-height: 1.05;
             letter-spacing: -0.02em;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             color: var(--c-papel);
         }
         .hero-subtitle {
-            font-size: 16px;
-            line-height: 1.65;
+            font-size: 15px;
+            line-height: 1.6;
             color: var(--c-grafite-light);
-            max-width: 720px;
+            max-width: 760px;
         }
 
         /* ================= METRICS GRID ================= */
@@ -360,14 +313,14 @@ class CVMHandler(SimpleHTTPRequestHandler):
             grid-template-columns: repeat(4, 1fr);
             border: 1px solid var(--c-hairline);
             background: var(--c-card-bg);
-            margin-bottom: 35px;
+            margin-bottom: 28px;
         }
         .metric-cell {
-            padding: 22px 24px;
+            padding: 18px 22px;
             border-right: 1px solid var(--c-hairline);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         .metric-cell:last-child {
             border-right: none;
@@ -381,12 +334,12 @@ class CVMHandler(SimpleHTTPRequestHandler):
         }
         .metric-cell-val {
             font-family: var(--font-mono);
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 600;
             color: var(--c-papel);
         }
         .metric-cell-sub {
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--c-grafite-light);
         }
 
@@ -394,15 +347,15 @@ class CVMHandler(SimpleHTTPRequestHandler):
         .search-container {
             border: 1px solid var(--c-hairline);
             background: var(--c-card-bg);
-            padding: 24px;
-            margin-bottom: 30px;
+            padding: 20px 22px;
+            margin-bottom: 25px;
         }
         .search-label {
             font-family: var(--font-mono);
             font-size: 10.5px;
             letter-spacing: 0.2em;
             color: var(--c-roxo-fume);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             display: flex;
             align-items: center;
@@ -410,28 +363,28 @@ class CVMHandler(SimpleHTTPRequestHandler):
         }
         .search-inputs-row {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 14px;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr 280px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         .search-box-wrap {
             position: relative;
         }
         .search-box-wrap i {
             position: absolute;
-            left: 18px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--c-roxo-fume);
-            font-size: 15px;
+            font-size: 14px;
         }
         .search-box-wrap input {
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--c-hairline);
-            padding: 14px 18px 14px 48px;
+            padding: 12px 16px 12px 44px;
             font-family: var(--font-body);
-            font-size: 15px;
+            font-size: 14px;
             color: var(--c-papel);
             border-radius: 6px;
             outline: none;
@@ -444,28 +397,64 @@ class CVMHandler(SimpleHTTPRequestHandler):
         .select-company-dropdown {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--c-hairline);
-            padding: 0 16px;
+            padding: 0 14px;
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13.5px;
             color: var(--c-papel);
             border-radius: 6px;
             outline: none;
             cursor: pointer;
-            transition: border-color 0.2s;
         }
         .select-company-dropdown:focus {
             border-color: var(--c-roxo-fume);
         }
 
+        /* Barra de Seleção de Meses (Ano Todo) */
+        .month-selector-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 12px 0;
+            border-top: 1px solid var(--c-hairline);
+            border-bottom: 1px solid var(--c-hairline);
+            margin-bottom: 14px;
+        }
+        .month-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            color: var(--c-roxo-fume);
+            margin-right: 6px;
+            text-transform: uppercase;
+        }
+        .month-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--c-hairline);
+            color: var(--c-grafite-light);
+            padding: 4px 11px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .month-pill:hover, .month-pill.active {
+            background: var(--c-roxo-profundo);
+            border-color: var(--c-roxo-fume);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
         .filter-pills-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .pills-prefix {
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 10px;
             letter-spacing: 0.15em;
             color: var(--c-grafite-light);
             margin-right: 4px;
@@ -474,7 +463,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--c-hairline);
             color: var(--c-grafite-light);
-            padding: 6px 14px;
+            padding: 4px 12px;
             font-family: var(--font-mono);
             font-size: 11px;
             border-radius: 9999px;
@@ -490,12 +479,12 @@ class CVMHandler(SimpleHTTPRequestHandler):
         /* ================= COMPANY PROFILE BANNER ================= */
         .company-profile-banner {
             border: 1px solid var(--c-roxo-fume);
-            background: linear-gradient(135deg, rgba(59, 7, 100, 0.2) 0%, rgba(17, 17, 21, 0.95) 100%);
-            padding: 22px 26px;
-            margin-bottom: 30px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(59, 7, 100, 0.25) 0%, rgba(17, 17, 21, 0.95) 100%);
+            padding: 16px 20px;
+            margin-bottom: 22px;
+            border-radius: 6px;
             display: none;
-            animation: fadeIn 0.25s ease-out;
+            animation: fadeIn 0.2s ease-out;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
@@ -506,44 +495,44 @@ class CVMHandler(SimpleHTTPRequestHandler):
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
         }
         .profile-company-info {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
         .profile-ticker-tag {
             font-family: var(--font-mono);
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             background: var(--c-roxo-profundo);
             color: var(--c-papel);
             border: 1px solid var(--c-roxo-fume);
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 4px 12px;
+            border-radius: 4px;
         }
         .profile-names h2 {
             font-family: var(--font-title);
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--c-papel);
         }
         .profile-names p {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--c-roxo-fume);
         }
         .profile-tags-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
         .profile-data-chip {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10.5px;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--c-hairline);
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             color: var(--c-grafite-light);
         }
@@ -551,136 +540,170 @@ class CVMHandler(SimpleHTTPRequestHandler):
             color: var(--c-papel);
         }
 
-        /* ================= FEED DE DOCUMENTOS ================= */
-        .docs-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 50px;
-        }
-        .doc-card {
+        /* ================= VIEWPORT COM OPÇÃO DE DESCER (SCROLL INTERNO) ================= */
+        .docs-viewport-card {
             border: 1px solid var(--c-hairline);
             background: var(--c-card-bg);
             border-radius: 8px;
-            padding: 24px 28px;
-            transition: all 0.2s;
+            overflow: hidden;
+            margin-bottom: 40px;
         }
-        .doc-card:hover {
-            border-color: rgba(140, 121, 192, 0.4);
-            background: var(--c-card-hover);
-        }
-        .doc-card-header {
+        .docs-viewport-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 14px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--c-hairline);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--c-grafite-light);
         }
-        .doc-meta-left {
+        .docs-count-badge {
+            color: var(--c-roxo-fume);
+            font-weight: 600;
+        }
+        .docs-scroll-indicator {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        /* Container Rolável de Dimensão Menor */
+        .docs-viewport-content {
+            max-height: 680px;
+            overflow-y: auto;
+            padding: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--c-roxo-fume) var(--c-tinta);
+        }
+        .docs-viewport-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .docs-viewport-content::-webkit-scrollbar-track {
+            background: #0A0A0B;
+        }
+        .docs-viewport-content::-webkit-scrollbar-thumb {
+            background: var(--c-roxo-fume);
+            border-radius: 3px;
+        }
+
+        /* Grid de 2 Colunas (Não fica todo na vertical!) */
+        .docs-grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+            gap: 14px;
+        }
+
+        /* Cards em Dimensão Menor */
+        .doc-item-compact {
+            border: 1px solid var(--c-hairline);
+            background: #0d0d11;
+            border-radius: 6px;
+            padding: 15px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .doc-item-compact:hover {
+            border-color: rgba(140, 121, 192, 0.45);
+            background: #13131a;
+        }
+        .doc-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .doc-tags-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex-wrap: wrap;
         }
-        .ticker-pill {
+        .doc-ticker-pill {
             font-family: var(--font-mono);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--c-roxo-fume);
-            background: rgba(59, 7, 100, 0.3);
+            background: rgba(59, 7, 100, 0.35);
             border: 1px solid rgba(140, 121, 192, 0.3);
-            padding: 3px 10px;
-            border-radius: 4px;
+            padding: 2px 8px;
+            border-radius: 3px;
         }
-        .company-heading {
+        .doc-company-title {
             font-family: var(--font-title);
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 600;
             color: var(--c-papel);
         }
-        .category-chip {
+        .doc-category-badge {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            padding: 3px 10px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 7px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--c-hairline);
             color: var(--c-grafite-light);
         }
-        .category-chip.fr {
+        .doc-category-badge.fr {
             background: rgba(244, 63, 94, 0.12);
             border-color: rgba(244, 63, 94, 0.35);
             color: #fb7185;
-            font-weight: 500;
+            font-weight: 600;
         }
-        .doc-date {
+        .doc-date-stamp {
             font-family: var(--font-mono);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--c-grafite-light);
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
-        .doc-subject {
-            font-size: 14.5px;
+        .doc-subject-line {
+            font-size: 13.5px;
             color: #d1d5db;
-            margin-bottom: 18px;
-            line-height: 1.6;
+            margin-bottom: 12px;
+            line-height: 1.5;
         }
 
-        /* ================= PARECER EXECUTIVO DE RI (ESTRUTURADO) ================= */
-        .ai-summary-card {
-            background: var(--c-summary-bg);
+        /* Resumo IA Compacto e Estruturado */
+        .ai-summary-compact {
+            background: #09080e;
             border: 1px solid rgba(140, 121, 192, 0.25);
             border-left: 3px solid var(--c-roxo-fume);
-            border-radius: 6px;
-            padding: 18px 22px;
-            margin-bottom: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
         }
-        .ai-summary-top {
+        .ai-summary-top-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
-        .ai-summary-badge {
+        .ai-label-wrap {
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            letter-spacing: 0.18em;
+            color: var(--c-roxo-fume);
+            font-weight: 600;
+            text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .bull-bracket {
-            font-family: var(--font-mono);
-            color: var(--c-roxo-fume);
-            font-weight: 700;
-        }
-        .ai-pulse-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--c-roxo-fume);
-            box-shadow: 0 0 8px var(--c-roxo-fume);
-            display: inline-block;
-        }
-        .ai-badge-title {
-            font-family: var(--font-mono);
-            font-size: 10.5px;
-            letter-spacing: 0.2em;
-            color: var(--c-roxo-fume);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
         .impact-pill {
             font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 0.16em;
-            padding: 3px 12px;
+            font-size: 9.5px;
+            letter-spacing: 0.12em;
+            padding: 2px 9px;
             border-radius: 9999px;
             font-weight: 600;
             text-transform: uppercase;
@@ -700,211 +723,175 @@ class CVMHandler(SimpleHTTPRequestHandler):
             color: #fb7185;
             border: 1px solid rgba(244, 63, 94, 0.3);
         }
-
-        .summary-intro-box {
-            font-size: 14px;
-            line-height: 1.65;
+        .summary-content-intro {
+            font-size: 13px;
+            line-height: 1.55;
             color: var(--c-papel);
-            margin-bottom: 16px;
-        }
-        .summary-intro-box strong {
-            color: #ffffff;
-        }
-        
-        .summary-section-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            color: var(--c-grafite-light);
-            text-transform: uppercase;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
-        .summary-bullets-grid {
+        .summary-bullets-box {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 18px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
-        .summary-bullet-item {
+        .summary-bullet-row {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 13.5px;
-            line-height: 1.6;
+            gap: 8px;
+            font-size: 12.5px;
+            line-height: 1.5;
             color: #e2e8f0;
         }
-        .bullet-dot {
-            width: 6px;
-            height: 6px;
+        .bullet-dot-mini {
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: var(--c-roxo-fume);
-            margin-top: 8px;
+            margin-top: 7px;
             flex-shrink: 0;
         }
-        .bullet-label {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .summary-analysis-box {
-            background: rgba(59, 7, 100, 0.18);
-            border: 1px solid rgba(140, 121, 192, 0.25);
-            border-radius: 6px;
-            padding: 14px 18px;
-        }
-        .analysis-box-header {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            color: var(--c-roxo-fume);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-        }
-        .analysis-box-body {
-            font-size: 13.5px;
-            line-height: 1.65;
+        .summary-analysis-callout {
+            background: rgba(59, 7, 100, 0.2);
+            border: 1px solid rgba(140, 121, 192, 0.2);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 12.5px;
+            line-height: 1.5;
             color: #e2e8f0;
         }
+        .analysis-label-mini {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            letter-spacing: 0.16em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
 
-        .doc-card-footer {
+        .doc-item-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid var(--c-hairline);
-            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 10px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
         }
-        .btn-generate-ai {
+        .btn-gen-ai {
             font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.12em;
-            background: rgba(59, 7, 100, 0.4);
+            font-size: 10.5px;
+            letter-spacing: 0.1em;
+            background: rgba(59, 7, 100, 0.35);
             border: 1px solid var(--c-roxo-fume);
             color: #d8b4fe;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 5px 12px;
+            border-radius: 4px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s;
         }
-        .btn-generate-ai:hover {
+        .btn-gen-ai:hover {
             background: var(--c-roxo-profundo);
             color: #ffffff;
-            box-shadow: 0 0 12px rgba(140, 121, 192, 0.3);
-            transform: translateY(-1px);
         }
-        .cvm-external-link {
+        .cvm-link-mini {
             font-family: var(--font-mono);
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--c-roxo-fume);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            letter-spacing: 0.06em;
+            gap: 5px;
         }
-        .cvm-external-link:hover {
+        .cvm-link-mini:hover {
             color: var(--c-papel);
             text-decoration: underline;
         }
 
         /* ================= RODAPÉ OFICIAL CF TECH (IMAGEM 2) ================= */
         .footer-system {
-            margin-top: 60px;
+            margin-top: 40px;
             border-top: 1px solid var(--c-hairline);
-            padding-top: 40px;
+            padding-top: 35px;
         }
         .footer-brand-box {
             display: grid;
-            grid-template-columns: 1fr 360px;
+            grid-template-columns: 1fr 340px;
             border: 1px solid var(--c-hairline);
             background: var(--c-card-bg);
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         .footer-left {
-            padding: 34px 32px;
+            padding: 28px 30px;
             border-right: 1px solid var(--c-hairline);
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
         .footer-label {
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 10px;
             letter-spacing: 0.2em;
             color: var(--c-roxo-fume);
             text-transform: uppercase;
         }
         .footer-desc {
-            font-size: 14px;
-            line-height: 1.7;
+            font-size: 13.5px;
+            line-height: 1.65;
             color: var(--c-papel);
         }
-        .footer-desc strong {
-            color: #ffffff;
-        }
         .footer-disclaimer {
-            font-size: 12px;
-            line-height: 1.6;
+            font-size: 11.5px;
+            line-height: 1.55;
             color: var(--c-grafite-light);
             border-top: 1px solid var(--c-hairline);
-            padding-top: 12px;
-            margin-top: 6px;
+            padding-top: 10px;
+            margin-top: 4px;
         }
 
         .footer-right {
             background: #070709;
-            padding: 34px 28px;
+            padding: 28px 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
         .social-nav-title {
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 10px;
             letter-spacing: 0.24em;
             color: var(--c-roxo-fume);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-transform: uppercase;
         }
         .social-links-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         .social-btn {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--c-hairline);
-            border-radius: 6px;
+            border-radius: 5px;
             color: var(--c-papel);
             font-family: var(--font-body);
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
             transition: all 0.2s;
         }
         .social-btn-inner {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         .social-btn i {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--c-roxo-fume);
         }
         .social-arrow {
@@ -913,10 +900,10 @@ class CVMHandler(SimpleHTTPRequestHandler):
             transition: transform 0.2s;
         }
         .social-btn:hover {
-            background: rgba(59, 7, 100, 0.3);
+            background: rgba(59, 7, 100, 0.35);
             border-color: var(--c-roxo-fume);
             color: #ffffff;
-            transform: translateX(4px);
+            transform: translateX(3px);
         }
         .social-btn:hover .social-arrow {
             transform: translateX(3px);
@@ -928,29 +915,31 @@ class CVMHandler(SimpleHTTPRequestHandler):
             justify-content: space-between;
             align-items: center;
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 9.5px;
             letter-spacing: 0.16em;
             color: var(--c-grafite-light);
             text-transform: uppercase;
-            padding: 14px 0 30px;
+            padding: 12px 0 25px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 70px 20px;
+            padding: 50px 20px;
             color: var(--c-grafite-light);
-            font-size: 15px;
+            font-size: 14px;
             border: 1px dashed var(--c-hairline);
-            border-radius: 8px;
+            border-radius: 6px;
+            grid-column: 1 / -1;
         }
 
         @media (max-width: 900px) {
             .metrics-grid { grid-template-columns: 1fr 1fr; }
             .metric-cell:nth-child(2) { border-right: none; }
             .search-inputs-row { grid-template-columns: 1fr; }
+            .docs-grid-layout { grid-template-columns: 1fr; }
             .footer-brand-box { grid-template-columns: 1fr; }
             .footer-left { border-right: none; border-bottom: 1px solid var(--c-hairline); }
-            .hero-title { font-size: 38px; }
+            .hero-title { font-size: 34px; }
         }
     </style>
 </head>
@@ -965,21 +954,12 @@ class CVMHandler(SimpleHTTPRequestHandler):
     </div>
 
     <div class="container">
-        <!-- Header Oficial -->
+        <!-- Header Oficial com o Logo Novo Enviado -->
         <header>
             <div class="brand-lockup">
-                <div class="cf-mark-brackets">
-                    <span class="bracket">[</span>
-                    <!-- Touro Minimalista Vetorial CF Tech -->
-                    <svg class="bull-icon-svg" viewBox="0 0 32 32">
-                        <path d="M6 10C5 8.5 3 6.5 3 4.5C3 3.5 4 3 5 3C6.8 3 8.5 5.8 9.5 8C11.5 7.2 13.7 6.8 16 6.8C18.3 6.8 20.5 7.2 22.5 8C23.5 5.8 25.2 3 27 3C28 3 29 3.5 29 4.5C29 6.5 27 8.5 26 10C27.5 12.2 28.5 14.8 28.5 17.5C28.5 23.5 23 27.5 16 27.5C9 27.5 3.5 23.5 3.5 17.5C3.5 14.8 4.5 12.2 6 10ZM10.5 13.5C9.7 13.5 9 14.2 9 15C9 15.8 9.7 16.5 10.5 16.5C11.3 16.5 12 15.8 12 15C12 14.2 11.3 13.5 10.5 13.5ZM21.5 13.5C20.7 13.5 20 14.2 20 15C20 15.8 20.7 16.5 21.5 16.5C22.3 16.5 23 15.8 23 15C23 14.2 22.3 13.5 21.5 13.5Z"/>
-                    </svg>
-                    <span class="bracket">]</span>
-                </div>
-                <div class="brand-text">
-                    <div class="brand-title">CF <span>TECH</span></div>
-                    <div class="brand-sub">CEARÁ FINANCE &bull; FRONT OFFICE DE TECNOLOGIA</div>
-                </div>
+                <a href="http://localhost:8001" style="display:inline-flex;align-items:center;">
+                    <img src="/LOGO_CF_TECH.png" alt="CF TECH — Ceará Finance" class="logo-cf-banner" onerror="this.onerror=null;this.src='/LOGO_CF.png';">
+                </a>
             </div>
 
             <div class="header-actions">
@@ -991,9 +971,9 @@ class CVMHandler(SimpleHTTPRequestHandler):
         <!-- Capa Conceitual -->
         <section class="hero-section">
             <div class="hero-tag">01 &bull; REGULATÓRIO & PARECERES DE RI</div>
-            <h1 class="hero-title">Demonstrações e fatos relevantes,<br>direto da CVM.</h1>
+            <h1 class="hero-title">Fatos relevantes,<br>direto da CVM.</h1>
             <p class="hero-subtitle">
-                Busque uma empresa listada por ticker ou código CVM. Resumos executivos sintetizados por inteligência artificial, dados sem filtro, sem ruído e em escala original.
+                Busque uma empresa listada por ticker ou código CVM. Resumos executivos sintetizados por inteligência artificial, dados sem filtro, sem ruído e em escala original de todos os meses do ano.
             </p>
         </section>
 
@@ -1002,12 +982,12 @@ class CVMHandler(SimpleHTTPRequestHandler):
             <div class="metric-cell">
                 <div class="metric-cell-label">01 &bull; Documentos Oficiais 2026</div>
                 <div class="metric-cell-val" id="metric-total">33.541</div>
-                <div class="metric-cell-sub">Protocolos registrados na CVM</div>
+                <div class="metric-cell-sub">Todos os meses catalogados</div>
             </div>
             <div class="metric-cell">
                 <div class="metric-cell-label">02 &bull; Fatos Relevantes</div>
                 <div class="metric-cell-val" id="metric-fr">4.041</div>
-                <div class="metric-cell-sub">Eventos com impacto no mercado</div>
+                <div class="metric-cell-sub">Eventos de impacto no mercado</div>
             </div>
             <div class="metric-cell">
                 <div class="metric-cell-label">03 &bull; Universo B3 & CVM</div>
@@ -1016,10 +996,10 @@ class CVMHandler(SimpleHTTPRequestHandler):
             </div>
             <div class="metric-cell">
                 <div class="metric-cell-label">04 &bull; Inteligência Artificial</div>
-                <div class="metric-cell-val" style="color: var(--c-roxo-fume); font-size: 20px; display:flex; align-items:center; gap:8px;">
-                    <span class="ai-pulse-dot"></span> Gemini 3.1
+                <div class="metric-cell-val" style="color: var(--c-roxo-fume); font-size: 19px; display:flex; align-items:center; gap:8px;">
+                    <i class="fas fa-brain"></i> Gemini 3.1
                 </div>
-                <div class="metric-cell-sub">Síntese executiva & viés RI</div>
+                <div class="metric-cell-sub">Pareceres didáticos & síntese</div>
             </div>
         </div>
 
@@ -1039,8 +1019,23 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 </select>
             </div>
 
+            <!-- Barra de Seleção de Meses do Ano (Todos os Meses de 2026) -->
+            <div class="month-selector-bar">
+                <span class="month-label"><i class="far fa-calendar-check"></i> MESES 2026:</span>
+                <button class="month-pill active" onclick="selecionarMes('', this)">Ano Todo (Jan a Set)</button>
+                <button class="month-pill" onclick="selecionarMes('2026-09', this)">Set/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-08', this)">Ago/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-07', this)">Jul/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-06', this)">Jun/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-05', this)">Mai/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-04', this)">Abr/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-03', this)">Mar/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-02', this)">Fev/26</button>
+                <button class="month-pill" onclick="selecionarMes('2026-01', this)">Jan/26</button>
+            </div>
+
             <div class="filter-pills-row">
-                <span class="pills-prefix">FILTROS RÁPIDOS:</span>
+                <span class="pills-prefix">ATALHOS B3:</span>
                 <button class="pill-btn active" onclick="filtrarPill('', this)">Todas</button>
                 <button class="pill-btn" onclick="filtrarPill('Fato Relevante', this)">Fatos Relevantes</button>
                 <button class="pill-btn" onclick="filtrarPill('Comunicado', this)">Comunicados</button>
@@ -1056,7 +1051,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             </div>
         </div>
 
-        <!-- Card de Perfil da Empresa -->
+        <!-- Card de Perfil da Empresa Selecionada -->
         <div id="company-profile" class="company-profile-banner">
             <div class="profile-flex">
                 <div class="profile-company-info">
@@ -1074,9 +1069,24 @@ class CVMHandler(SimpleHTTPRequestHandler):
             </div>
         </div>
 
-        <!-- Feed de Documentos -->
-        <div id="docs-list" class="docs-feed">
-            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando base de comunicados oficiais da CVM...</div>
+        <!-- VIEWPORT COM OPÇÃO DE DESCER (SCROLL INTERNO & CARDS EM GRID COMPACTO) -->
+        <div class="docs-viewport-card">
+            <div class="docs-viewport-header">
+                <div>
+                    <span>REGISTROS ENCONTRADOS: </span>
+                    <strong class="docs-count-badge" id="visible-count">0</strong>
+                </div>
+                <div class="docs-scroll-indicator">
+                    <span>Role para descer e ver mais</span>
+                    <i class="fas fa-arrow-down" style="color: var(--c-roxo-fume);"></i>
+                </div>
+            </div>
+
+            <div class="docs-viewport-content" id="docs-scroll-area">
+                <div id="docs-list" class="docs-grid-layout">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando base de comunicados oficiais da CVM...</div>
+                </div>
+            </div>
         </div>
 
         <!-- ================= RODAPÉ OFICIAL CF TECH (IMAGEM 2) ================= -->
@@ -1128,6 +1138,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
         let todosDocumentos = [];
         let catalogoEmpresas = [];
         let filtroAtivo = '';
+        let mesAtivo = '';
         let timerSearch = null;
 
         async function carregarCatalogoEmpresas() {
@@ -1167,10 +1178,14 @@ class CVMHandler(SimpleHTTPRequestHandler):
             } catch (e) {}
         }
 
-        async function carregarDocs(termo = '') {
+        async function carregarDocs() {
             const listEl = document.getElementById('docs-list');
+            const termo = document.getElementById('input-search').value.trim();
             try {
-                const url = termo ? `/api/documentos?q=${encodeURIComponent(termo)}` : '/api/documentos';
+                let url = '/api/documentos?';
+                if (termo) url += `q=${encodeURIComponent(termo)}&`;
+                if (mesAtivo) url += `mes=${encodeURIComponent(mesAtivo)}&`;
+                
                 const res = await fetch(url);
                 todosDocumentos = await res.json();
                 atualizarPerfilEmpresa(termo);
@@ -1178,6 +1193,13 @@ class CVMHandler(SimpleHTTPRequestHandler):
             } catch (err) {
                 listEl.innerHTML = `<div class="empty-state" style="color: #ff6b6b;">Erro ao carregar documentos: ${err.message}</div>`;
             }
+        }
+
+        function selecionarMes(mes, btn) {
+            mesAtivo = mes;
+            document.querySelectorAll('.month-selector-bar .month-pill').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            carregarDocs();
         }
 
         function atualizarPerfilEmpresa(termo) {
@@ -1212,7 +1234,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             if (btn) btn.classList.add('active');
             
             document.getElementById('input-search').value = cat;
-            carregarDocs(cat);
+            carregarDocs();
         }
 
         function selecionarDropdown(ticker) {
@@ -1220,14 +1242,13 @@ class CVMHandler(SimpleHTTPRequestHandler):
             document.getElementById('input-search').value = ticker;
             filtroAtivo = ticker;
             document.querySelectorAll('.filter-pills-row .pill-btn').forEach(b => b.classList.remove('active'));
-            carregarDocs(ticker);
+            carregarDocs();
         }
 
         function debounceSearch() {
             clearTimeout(timerSearch);
             timerSearch = setTimeout(() => {
-                const termo = document.getElementById('input-search').value.trim();
-                carregarDocs(termo);
+                carregarDocs();
             }, 300);
         }
 
@@ -1263,13 +1284,11 @@ class CVMHandler(SimpleHTTPRequestHandler):
             const parts = text.split(/###\s*\**([^*]+)\**/);
 
             let html = `
-            <div class="ai-summary-card">
-                <div class="ai-summary-top">
-                    <div class="ai-summary-badge">
-                        <span class="bull-bracket">[</span>
-                        <span class="ai-pulse-dot"></span>
-                        <span class="bull-bracket">]</span>
-                        <span class="ai-badge-title">PARECER EXECUTIVO DE RI &bull; GEMINI 3.1</span>
+            <div class="ai-summary-compact">
+                <div class="ai-summary-top-row">
+                    <div class="ai-label-wrap">
+                        <i class="fas fa-brain" style="color:var(--c-roxo-fume);"></i>
+                        <span>PARECER EXECUTIVO RI &bull; GEMINI</span>
                     </div>
                     <div class="impact-pill ${impactoClass}">${impacto}</div>
                 </div>
@@ -1279,7 +1298,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 const intro = parts[0].trim();
                 if (intro && intro.length > 15) {
                     const introFmt = formatarNegrito(intro);
-                    html += `<div class="summary-intro-box">${introFmt}</div>`;
+                    html += `<div class="summary-content-intro">${introFmt}</div>`;
                 }
 
                 for (let i = 1; i < parts.length; i += 2) {
@@ -1291,45 +1310,36 @@ class CVMHandler(SimpleHTTPRequestHandler):
                     if (isAnalysis) {
                         const bodyFmt = formatarNegrito(body);
                         html += `
-                        <div class="summary-analysis-box">
-                            <div class="analysis-box-header">
-                                <i class="fas fa-compass"></i>
-                                <span>${header.toUpperCase()}</span>
-                            </div>
-                            <div class="analysis-box-body">${bodyFmt}</div>
+                        <div class="summary-analysis-callout">
+                            <div class="analysis-label-mini"><i class="fas fa-compass"></i> ${header.toUpperCase()}</div>
+                            <div>${bodyFmt}</div>
                         </div>
                         `;
                     } else {
-                        html += `
-                        <div class="summary-section-label">
-                            <i class="fas fa-angle-right"></i> ${header.toUpperCase()}
-                        </div>
-                        <div class="summary-bullets-grid">
-                        `;
-
-                        const lines = body.split('\\n');
+                        html += `<div class="summary-bullets-box">`;
+                        const lines = body.split('\n');
                         for (let line of lines) {
                             line = line.trim();
                             if (!line) continue;
 
                             if (line.startsWith('*') || line.startsWith('-')) {
-                                let bullet = line.replace(/^[\\*\\-]\\s*/, '').trim();
+                                let bullet = line.replace(/^[\*\-]\s*/, '').trim();
                                 bullet = formatarNegrito(bullet);
                                 html += `
-                                <div class="summary-bullet-item">
-                                    <span class="bullet-dot"></span>
+                                <div class="summary-bullet-row">
+                                    <span class="bullet-dot-mini"></span>
                                     <div>${bullet}</div>
                                 </div>
                                 `;
                             } else {
-                                html += `<div class="summary-intro-box">${formatarNegrito(line)}</div>`;
+                                html += `<div class="summary-content-intro">${formatarNegrito(line)}</div>`;
                             }
                         }
                         html += `</div>`;
                     }
                 }
             } else {
-                html += `<div class="summary-intro-box">${formatarNegrito(text)}</div>`;
+                html += `<div class="summary-content-intro">${formatarNegrito(text)}</div>`;
             }
 
             html += `</div>`;
@@ -1338,22 +1348,22 @@ class CVMHandler(SimpleHTTPRequestHandler):
 
         function formatarNegrito(str) {
             return str
-                .replace(/\\*\\*([^\\*]+)\\*\\*/g, '<strong class="bullet-label">$1</strong>')
-                .replace(/\\*([^\\*]+)\\*/g, '<em>$1</em>');
+                .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^\*]+)\*/g, '<em>$1</em>');
         }
 
         async function gerarResumo(link, ticker, btnEl) {
-            btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando Análise RI via Gemini...';
+            btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando Parecer RI...';
             btnEl.disabled = true;
             try {
                 const res = await fetch(`/api/resumir?link=${encodeURIComponent(link)}&ticker=${encodeURIComponent(ticker)}`);
                 const data = await res.json();
                 if (data.status === 'ok' && data.resumo) {
-                    const card = btnEl.closest('.doc-card');
+                    const card = btnEl.closest('.doc-item-compact');
                     const summaryHtml = formatarResumoExecutivo(data.resumo);
                     const temp = document.createElement('div');
                     temp.innerHTML = summaryHtml;
-                    card.insertBefore(temp.firstElementChild, card.querySelector('.doc-card-footer'));
+                    card.insertBefore(temp.firstElementChild, card.querySelector('.doc-item-footer'));
                     btnEl.remove();
                 } else {
                     btnEl.innerText = 'Falha ao resumir. Tentar novamente';
@@ -1367,10 +1377,13 @@ class CVMHandler(SimpleHTTPRequestHandler):
 
         function renderizarDocs() {
             const listEl = document.getElementById('docs-list');
+            const countEl = document.getElementById('visible-count');
             let docs = [...todosDocumentos];
 
+            countEl.innerText = `${docs.length} fatos/documentos`;
+
             if (docs.length === 0) {
-                listEl.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open" style="font-size: 36px; margin-bottom: 12px; display:block; opacity:0.4;"></i>Nenhum documento encontrado na base para este critério de busca.</div>';
+                listEl.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open" style="font-size: 32px; margin-bottom: 10px; display:block; opacity:0.4;"></i>Nenhum documento encontrado na base para este critério ou período.</div>';
                 return;
             }
 
@@ -1384,22 +1397,24 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 const isFR = cat.toLowerCase().includes('relevante') || (d.doc_type || '').toLowerCase().includes('relevante');
 
                 const resumoHtml = d.resumo_ia ? formatarResumoExecutivo(d.resumo_ia) : '';
-                const btnResumo = !resumoHtml && d.link ? `<button class="btn-generate-ai" onclick="gerarResumo('${d.link}', '${ticker}', this)"><i class="fas fa-wand-magic-sparkles"></i> Gerar Parecer IA (Gemini)</button>` : '';
-                const link = d.link ? `<a href="${d.link}" target="_blank" class="cvm-external-link">Acessar Documento Oficial CVM <i class="fas fa-external-link-alt"></i></a>` : '';
+                const btnResumo = !resumoHtml && d.link ? `<button class="btn-gen-ai" onclick="gerarResumo('${d.link}', '${ticker}', this)"><i class="fas fa-wand-magic-sparkles"></i> Parecer IA</button>` : '';
+                const link = d.link ? `<a href="${d.link}" target="_blank" class="cvm-link-mini">CVM Oficial <i class="fas fa-arrow-up-right-from-square"></i></a>` : '';
 
                 html += `
-                <div class="doc-card">
-                    <div class="doc-card-header">
-                        <div class="doc-meta-left">
-                            <span class="ticker-pill">[ ${ticker} ]</span>
-                            <span class="company-heading">${comp}</span>
-                            <span class="category-chip ${isFR ? 'fr' : ''}">${cat}</span>
+                <div class="doc-item-compact">
+                    <div>
+                        <div class="doc-item-header">
+                            <div class="doc-tags-left">
+                                <span class="doc-ticker-pill">${ticker}</span>
+                                <span class="doc-company-title">${comp}</span>
+                                <span class="doc-category-badge ${isFR ? 'fr' : ''}">${cat}</span>
+                            </div>
+                            <div class="doc-date-stamp"><i class="far fa-calendar"></i> ${data}</div>
                         </div>
-                        <div class="doc-date"><i class="far fa-calendar"></i> ${data}</div>
+                        <div class="doc-subject-line">${desc}</div>
+                        ${resumoHtml}
                     </div>
-                    <div class="doc-subject">${desc}</div>
-                    ${resumoHtml}
-                    <div class="doc-card-footer">
+                    <div class="doc-item-footer">
                         ${btnResumo}
                         ${link}
                     </div>

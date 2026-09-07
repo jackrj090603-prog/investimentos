@@ -182,11 +182,11 @@ def get_historico_chat(chat_id, limit=15):
     messages = [{"role": row["role"], "message": row["message"]} for row in reversed(rows)]
     return messages
 
-def get_todos_documentos(limit=120):
+def get_todos_documentos(mes="", limit=150):
     """
     Retorna a lista combinada de documentos:
-    Primeiro os documentos processados com resumo IA, complementados com os
-    mais recentes da base oficial da CVM (33.000+ docs).
+    Primeiro os documentos processados com resumo IA, complementados com a
+    base oficial da CVM (33.000+ docs). Suporta filtro por mês (ex: 2026-03) ou ano todo.
     """
     conn = get_connection()
     conn.row_factory = sqlite3.Row
@@ -197,20 +197,32 @@ def get_todos_documentos(limit=120):
     seen_links = set()
     
     # 1. Documentos prioritários (com resumo IA e tags)
-    cursor.execute("SELECT * FROM documentos ORDER BY id DESC LIMIT ?", (limit,))
+    if mes:
+        cursor.execute("SELECT * FROM documentos WHERE delivery_date LIKE ? ORDER BY id DESC LIMIT ?", (f"{mes}%", limit))
+    else:
+        cursor.execute("SELECT * FROM documentos ORDER BY id DESC LIMIT ?", (limit,))
+        
     for r in cursor.fetchall():
         d = dict(r)
         seen_links.add(d.get("link"))
         results.append(d)
         
-    # 2. Complementar com os mais recentes da base oficial da CVM de 2026
+    # 2. Complementar com a base oficial da CVM de 2026
     remaining = limit - len(results)
     if remaining > 0:
-        cursor.execute("""
-            SELECT * FROM cvm_base_oficial 
-            ORDER BY delivery_date DESC, id DESC 
-            LIMIT ?
-        """, (remaining * 2,))
+        if mes:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial 
+                WHERE delivery_date LIKE ?
+                ORDER BY delivery_date DESC, id DESC 
+                LIMIT ?
+            """, (f"{mes}%", remaining * 2))
+        else:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial 
+                ORDER BY delivery_date DESC, id DESC 
+                LIMIT ?
+            """, (remaining * 2,))
         
         for r in cursor.fetchall():
             lnk = r["link"]
@@ -239,13 +251,13 @@ def get_todos_documentos(limit=120):
     conn.close()
     return results
 
-def buscar_documentos_por_termo(query, limit=100):
+def buscar_documentos_por_termo(query, mes="", limit=150):
     """
     Busca universal: localiza qualquer empresa por TICKER (ex: MGLU3, ITUB4, PETR4, BBAS3),
-    código CVM, CNPJ, Razão Social ou termos gerais (dividendos, balanço, fato relevante).
+    código CVM, CNPJ, Razão Social ou termos gerais. Suporta filtro por mês do ano.
     """
     if not query or not query.strip():
-        return get_todos_documentos(limit=limit)
+        return get_todos_documentos(mes=mes, limit=limit)
         
     termo = query.strip()
     conn = get_connection()
@@ -264,22 +276,38 @@ def buscar_documentos_por_termo(query, limit=100):
         nome = emp["nome"]
         
         # A) Buscar em documentos (já com resumo IA)
-        cursor.execute("""
-            SELECT * FROM documentos 
-            WHERE ticker = ? OR cvm_code = ? OR company_name LIKE ?
-            ORDER BY id DESC LIMIT ?
-        """, (ticker, emp.get("cvm_code"), f"%{nome[:15]}%", limit))
+        if mes:
+            cursor.execute("""
+                SELECT * FROM documentos 
+                WHERE (ticker = ? OR cvm_code = ? OR company_name LIKE ?) AND delivery_date LIKE ?
+                ORDER BY id DESC LIMIT ?
+            """, (ticker, emp.get("cvm_code"), f"%{nome[:15]}%", f"{mes}%", limit))
+        else:
+            cursor.execute("""
+                SELECT * FROM documentos 
+                WHERE ticker = ? OR cvm_code = ? OR company_name LIKE ?
+                ORDER BY id DESC LIMIT ?
+            """, (ticker, emp.get("cvm_code"), f"%{nome[:15]}%", limit))
+            
         for r in cursor.fetchall():
             d = dict(r)
             seen_links.add(d.get("link"))
             results.append(d)
             
-        # B) Buscar na base oficial completa da CVM (33.500+ docs)
-        cursor.execute("""
-            SELECT * FROM cvm_base_oficial
-            WHERE cvm_code_clean = ? OR company_name LIKE ?
-            ORDER BY delivery_date DESC, id DESC LIMIT ?
-        """, (cvm_clean, f"%{nome[:15]}%", limit))
+        # B) Buscar na base oficial completa da CVM (33.500+ docs cobrindo todos os meses)
+        if mes:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial
+                WHERE (cvm_code_clean = ? OR company_name LIKE ?) AND delivery_date LIKE ?
+                ORDER BY delivery_date DESC, id DESC LIMIT ?
+            """, (cvm_clean, f"%{nome[:15]}%", f"{mes}%", limit))
+        else:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial
+                WHERE cvm_code_clean = ? OR company_name LIKE ?
+                ORDER BY delivery_date DESC, id DESC LIMIT ?
+            """, (cvm_clean, f"%{nome[:15]}%", limit))
+            
         for r in cursor.fetchall():
             lnk = r["link"]
             if lnk not in seen_links:
@@ -300,21 +328,39 @@ def buscar_documentos_por_termo(query, limit=100):
     else:
         # C) Busca textual ampla
         search = f"%{termo}%"
-        cursor.execute("""
-            SELECT * FROM documentos 
-            WHERE ticker LIKE ? OR company_name LIKE ? OR category LIKE ? OR description LIKE ? OR resumo_ia LIKE ?
-            ORDER BY id DESC LIMIT ?
-        """, (search, search, search, search, search, limit))
+        if mes:
+            cursor.execute("""
+                SELECT * FROM documentos 
+                WHERE (ticker LIKE ? OR company_name LIKE ? OR category LIKE ? OR description LIKE ? OR resumo_ia LIKE ?)
+                AND delivery_date LIKE ?
+                ORDER BY id DESC LIMIT ?
+            """, (search, search, search, search, search, f"{mes}%", limit))
+        else:
+            cursor.execute("""
+                SELECT * FROM documentos 
+                WHERE ticker LIKE ? OR company_name LIKE ? OR category LIKE ? OR description LIKE ? OR resumo_ia LIKE ?
+                ORDER BY id DESC LIMIT ?
+            """, (search, search, search, search, search, limit))
+            
         for r in cursor.fetchall():
             d = dict(r)
             seen_links.add(d.get("link"))
             results.append(d)
             
-        cursor.execute("""
-            SELECT * FROM cvm_base_oficial
-            WHERE subject LIKE ? OR category LIKE ? OR doc_type LIKE ? OR company_name LIKE ?
-            ORDER BY delivery_date DESC, id DESC LIMIT ?
-        """, (search, search, search, search, limit))
+        if mes:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial
+                WHERE (subject LIKE ? OR category LIKE ? OR doc_type LIKE ? OR company_name LIKE ?)
+                AND delivery_date LIKE ?
+                ORDER BY delivery_date DESC, id DESC LIMIT ?
+            """, (search, search, search, search, f"{mes}%", limit))
+        else:
+            cursor.execute("""
+                SELECT * FROM cvm_base_oficial
+                WHERE subject LIKE ? OR category LIKE ? OR doc_type LIKE ? OR company_name LIKE ?
+                ORDER BY delivery_date DESC, id DESC LIMIT ?
+            """, (search, search, search, search, limit))
+            
         for r in cursor.fetchall():
             lnk = r["link"]
             if lnk not in seen_links:
