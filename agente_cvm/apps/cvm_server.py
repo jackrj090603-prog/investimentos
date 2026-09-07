@@ -72,7 +72,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 self.send_response(400)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.end_headers()
-                self.wfile.write(b'{"error": "Par\xc3\xa2metro link obrigat\xc3\xb3rio"}')
+                self.wfile.write(b'{"error": "Parametro link obrigatorio"}')
                 return
                 
             conn = storage.get_connection()
@@ -101,7 +101,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 try:
                     resumo = llm.resumir_documento(doc_obj, link)
                 except Exception as e:
-                    resumo = f"Resumo executivo emitido para {doc_obj['company_name']} ({doc_obj['ticker']}): Trata-se de {doc_obj['category']} referente a {doc_obj['description']} protocolado na CVM."
+                    resumo = f"### Síntese do Evento\nDocumento oficial ({doc_obj['category']}) protocolado por {doc_obj['company_name']} ({doc_obj['ticker']}) na CVM.\n\n### Destaques Principais\n* **Assunto:** {doc_obj['description']}\n* **Data:** Divulgado em {doc_obj['delivery_date']}\n* **Protocolo:** Disponível na íntegra nos sistemas da CVM.\n\n### Análise para o Investidor de Longo Prazo\nClassificação: **Neutro**. Trata-se de divulgação regulatória que não altera de imediato os fundamentos estruturais da companhia."
                     
                 doc_obj["resumo_ia"] = resumo
                 storage.salvar_documento(doc_obj)
@@ -136,523 +136,992 @@ class CVMHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def render_cvm_dashboard(self):
-        html = """<!DOCTYPE html>
+        html = r"""<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVM Intelligence — Ceará Finance | Todas as Empresas B3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>CF TECH — CVM Intelligence & Pareceres de RI | Ceará Finance</title>
+    <!-- Tipografia Oficial Manual de Marca CF Tech v2 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #07080c;
-            --bg-card: #0d0f17;
-            --bg-card-hover: #131722;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent: #46e0a0;
-            --accent-glow: rgba(70, 224, 160, 0.25);
-            --ai-purple: #a855f7;
-            --ai-glow: rgba(168, 85, 247, 0.2);
-            --text-main: #ffffff;
-            --text-muted: #8e9bb0;
+            /* Paleta Oficial do Manual de Marca v2 */
+            --c-tinta: #0A0A0B;
+            --c-papel: #F5F3EF;
+            --c-papel-alt: #E9E7E2;
+            --c-roxo-profundo: #3B0764;
+            --c-roxo-fume: #8C79C0;
+            --c-grafite: #5A5A62;
+            --c-grafite-light: #8A8A93;
+            --c-hairline: #222228;
+            --c-hairline-light: #D8D4CB;
+            --c-card-bg: #111115;
+            --c-card-hover: #15151B;
+            --c-summary-bg: #0D0C13;
+            
+            /* Status */
+            --status-pos: #22c55e;
+            --status-neu: #8C79C0;
+            --status-risk: #f43f5e;
+            
+            /* Fontes */
+            --font-title: 'Familjen Grotesk', sans-serif;
+            --font-body: 'Space Grotesk', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-main);
-            padding: 24px;
+            font-family: var(--font-body);
+            background: var(--c-tinta);
+            color: var(--c-papel);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            text-wrap: pretty;
+            line-height: 1.5;
         }
+        
+        ::selection {
+            background: var(--c-roxo-profundo);
+            color: var(--c-papel);
+        }
+        
+        a {
+            color: var(--c-roxo-fume);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        a:hover {
+            color: var(--c-papel);
+        }
+
+        /* ================= TICKER TAPE / MARQUEE ================= */
+        .marquee-bar {
+            background: var(--c-papel);
+            color: var(--c-tinta);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            padding: 7px 0;
+            text-transform: uppercase;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
+            border-bottom: 1px solid var(--c-tinta);
+            font-weight: 500;
+        }
+        .marquee-track {
+            display: inline-flex;
+            animation: marquee 35s linear infinite;
+        }
+        .marquee-track span {
+            padding: 0 20px;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ================= CONTAINER & HEADER ================= */
         .container {
-            max-width: 1280px;
+            max-width: 1240px;
             margin: 0 auto;
+            padding: 0 24px 80px;
         }
+
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 25px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--c-hairline);
+            margin-bottom: 35px;
         }
-        .brand {
+
+        .brand-lockup {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-        .brand img {
-            height: 48px;
-            object-fit: contain;
+
+        /* Touro entre Colchetes (Marca Oficial) */
+        .cf-mark-brackets {
+            display: flex;
+            align-items: center;
+            background: rgba(59, 7, 100, 0.25);
+            border: 1px solid rgba(140, 121, 192, 0.35);
+            padding: 6px 10px;
+            border-radius: 8px;
+            gap: 4px;
         }
-        .brand-title h1 {
+        .bracket {
+            font-family: var(--font-mono);
             font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-        .brand-title p {
-            font-size: 12px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
             font-weight: 700;
+            color: var(--c-roxo-fume);
+            line-height: 1;
         }
-        .header-nav {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .bull-icon-svg {
+            width: 26px;
+            height: 26px;
+            fill: var(--c-papel);
+            display: block;
         }
-        .btn-nav {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .btn-nav:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 25px;
-        }
-        .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 18px 20px;
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-        }
-        .metric-card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--accent);
-        }
-        .metric-card.ai-card::before {
-            background: var(--ai-purple);
-        }
-        .metric-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-        }
-        .metric-val {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff;
-            font-family: var(--font-mono);
-        }
-
-        /* Hero Search */
-        .search-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px 24px;
-            margin-bottom: 25px;
-        }
-        .search-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #cbd5e1;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .search-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .search-box {
-            flex-grow: 1;
-            position: relative;
-        }
-        .search-box i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent);
-            font-size: 16px;
-        }
-        .search-box input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            padding: 14px 16px 14px 46px;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 15px;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .search-box input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-        .select-company {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            padding: 0 16px;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            cursor: pointer;
-            min-width: 260px;
-        }
-        .select-company:focus {
-            border-color: var(--accent);
-        }
-
-        .filter-pills {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .pill-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-right: 4px;
-        }
-        .pill {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 6px 14px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .pill:hover, .pill.active {
-            background: rgba(70, 224, 160, 0.15);
-            border-color: var(--accent);
-            color: #ffffff;
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        /* Company Profile Header */
-        .company-profile-card {
-            background: linear-gradient(135deg, rgba(70, 224, 160, 0.08) 0%, rgba(13, 15, 23, 0.95) 100%);
-            border: 1px solid rgba(70, 224, 160, 0.3);
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 25px;
-            display: none;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .profile-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .profile-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .profile-ticker {
-            background: var(--accent);
-            color: #07080c;
-            font-family: var(--font-mono);
-            font-size: 18px;
-            font-weight: 800;
-            padding: 6px 14px;
-            border-radius: 8px;
-        }
-        .profile-title h2 {
-            font-size: 18px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-        .profile-title p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-        .profile-tags {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .profile-badge {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid var(--border-color);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            color: #cbd5e1;
-            font-family: var(--font-mono);
-        }
-        .profile-badge strong {
-            color: var(--accent);
-        }
-
-        /* Document Items */
-        .docs-list {
+        
+        .brand-text {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 2px;
         }
-        .doc-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 20px 24px;
-            transition: all 0.2s;
-        }
-        .doc-item:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(255, 255, 255, 0.18);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
-        .doc-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .doc-title-line {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .ticker-tag {
-            background: #1e293b;
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            font-family: var(--font-mono);
-        }
-        .company-name {
-            font-size: 16px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        .doc-category {
-            background: rgba(70, 224, 160, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(70, 224, 160, 0.25);
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 6px;
+        .brand-title {
+            font-family: var(--font-title);
             font-weight: 600;
+            font-size: 22px;
+            letter-spacing: -0.02em;
+            line-height: 1;
+            color: var(--c-papel);
         }
-        .doc-category.fr {
-            background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
-            border-color: rgba(239, 68, 68, 0.3);
+        .brand-title span {
+            color: var(--c-roxo-fume);
         }
-        .doc-meta {
-            font-size: 13px;
-            color: var(--text-muted);
+        .brand-sub {
             font-family: var(--font-mono);
+            font-size: 9.5px;
+            letter-spacing: 0.22em;
+            color: var(--c-grafite-light);
+            text-transform: uppercase;
+        }
+
+        .header-actions {
             display: flex;
+            gap: 12px;
             align-items: center;
-            gap: 6px;
         }
-        .doc-desc {
-            font-size: 14px;
-            color: #e2e8f0;
-            margin-bottom: 14px;
-            line-height: 1.6;
-        }
-        .doc-summary {
-            background: rgba(168, 85, 247, 0.08);
-            border-left: 3px solid var(--ai-purple);
-            padding: 14px 18px;
-            border-radius: 0 10px 10px 0;
-            font-size: 13.5px;
-            color: #e2e8f0;
-            margin-bottom: 14px;
-            line-height: 1.6;
-            box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.05);
-        }
-        .doc-summary strong {
-            color: #c084fc;
-        }
-        .doc-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .btn-ai-sum {
-            background: rgba(168, 85, 247, 0.12);
-            border: 1px solid rgba(168, 85, 247, 0.35);
-            color: #d8b4fe;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+        .btn-top {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            color: var(--c-papel);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--c-hairline);
+            padding: 8px 16px;
+            border-radius: 6px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .btn-ai-sum:hover {
-            background: rgba(168, 85, 247, 0.25);
-            color: #ffffff;
+        .btn-top:hover {
+            background: rgba(140, 121, 192, 0.15);
+            border-color: var(--c-roxo-fume);
+            color: var(--c-papel);
             transform: translateY(-1px);
         }
-        .doc-link {
-            font-size: 12.5px;
-            color: #60a5fa;
-            text-decoration: none;
+
+        /* ================= HERO SECTION ================= */
+        .hero-section {
+            padding: 20px 0 35px;
+            border-bottom: 1px solid var(--c-hairline);
+            margin-bottom: 35px;
+        }
+        .hero-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.24em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        .hero-title {
+            font-family: var(--font-title);
             font-weight: 600;
+            font-size: 52px;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            margin-bottom: 14px;
+            color: var(--c-papel);
+        }
+        .hero-subtitle {
+            font-size: 16px;
+            line-height: 1.65;
+            color: var(--c-grafite-light);
+            max-width: 720px;
+        }
+
+        /* ================= METRICS GRID ================= */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--c-hairline);
+            background: var(--c-card-bg);
+            margin-bottom: 35px;
+        }
+        .metric-cell {
+            padding: 22px 24px;
+            border-right: 1px solid var(--c-hairline);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .metric-cell:last-child {
+            border-right: none;
+        }
+        .metric-cell-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--c-roxo-fume);
+            text-transform: uppercase;
+        }
+        .metric-cell-val {
+            font-family: var(--font-mono);
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--c-papel);
+        }
+        .metric-cell-sub {
+            font-size: 11.5px;
+            color: var(--c-grafite-light);
+        }
+
+        /* ================= SEARCH & CONTROLS ================= */
+        .search-container {
+            border: 1px solid var(--c-hairline);
+            background: var(--c-card-bg);
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+        .search-label {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.2em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .search-box-wrap {
+            position: relative;
+        }
+        .search-box-wrap i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--c-roxo-fume);
+            font-size: 15px;
+        }
+        .search-box-wrap input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--c-hairline);
+            padding: 14px 18px 14px 48px;
+            font-family: var(--font-body);
+            font-size: 15px;
+            color: var(--c-papel);
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-box-wrap input:focus {
+            border-color: var(--c-roxo-fume);
+            box-shadow: 0 0 0 2px rgba(140, 121, 192, 0.25);
+        }
+        .select-company-dropdown {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--c-hairline);
+            padding: 0 16px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            color: var(--c-papel);
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .select-company-dropdown:focus {
+            border-color: var(--c-roxo-fume);
+        }
+
+        .filter-pills-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pills-prefix {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.15em;
+            color: var(--c-grafite-light);
+            margin-right: 4px;
+        }
+        .pill-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--c-hairline);
+            color: var(--c-grafite-light);
+            padding: 6px 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pill-btn:hover, .pill-btn.active {
+            background: rgba(140, 121, 192, 0.18);
+            border-color: var(--c-roxo-fume);
+            color: var(--c-papel);
+        }
+
+        /* ================= COMPANY PROFILE BANNER ================= */
+        .company-profile-banner {
+            border: 1px solid var(--c-roxo-fume);
+            background: linear-gradient(135deg, rgba(59, 7, 100, 0.2) 0%, rgba(17, 17, 21, 0.95) 100%);
+            padding: 22px 26px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .profile-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .profile-company-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .profile-ticker-tag {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--c-roxo-profundo);
+            color: var(--c-papel);
+            border: 1px solid var(--c-roxo-fume);
+            padding: 6px 14px;
+            border-radius: 6px;
+        }
+        .profile-names h2 {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--c-papel);
+        }
+        .profile-names p {
+            font-size: 13px;
+            color: var(--c-roxo-fume);
+        }
+        .profile-tags-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .profile-data-chip {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--c-hairline);
+            padding: 5px 12px;
+            border-radius: 4px;
+            color: var(--c-grafite-light);
+        }
+        .profile-data-chip strong {
+            color: var(--c-papel);
+        }
+
+        /* ================= FEED DE DOCUMENTOS ================= */
+        .docs-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+        .doc-card {
+            border: 1px solid var(--c-hairline);
+            background: var(--c-card-bg);
+            border-radius: 8px;
+            padding: 24px 28px;
+            transition: all 0.2s;
+        }
+        .doc-card:hover {
+            border-color: rgba(140, 121, 192, 0.4);
+            background: var(--c-card-hover);
+        }
+        .doc-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .doc-meta-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ticker-pill {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--c-roxo-fume);
+            background: rgba(59, 7, 100, 0.3);
+            border: 1px solid rgba(140, 121, 192, 0.3);
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+        .company-heading {
+            font-family: var(--font-title);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--c-papel);
+        }
+        .category-chip {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--c-hairline);
+            color: var(--c-grafite-light);
+        }
+        .category-chip.fr {
+            background: rgba(244, 63, 94, 0.12);
+            border-color: rgba(244, 63, 94, 0.35);
+            color: #fb7185;
+            font-weight: 500;
+        }
+        .doc-date {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--c-grafite-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .doc-subject {
+            font-size: 14.5px;
+            color: #d1d5db;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        /* ================= PARECER EXECUTIVO DE RI (ESTRUTURADO) ================= */
+        .ai-summary-card {
+            background: var(--c-summary-bg);
+            border: 1px solid rgba(140, 121, 192, 0.25);
+            border-left: 3px solid var(--c-roxo-fume);
+            border-radius: 6px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .ai-summary-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .ai-summary-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bull-bracket {
+            font-family: var(--font-mono);
+            color: var(--c-roxo-fume);
+            font-weight: 700;
+        }
+        .ai-pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c-roxo-fume);
+            box-shadow: 0 0 8px var(--c-roxo-fume);
+            display: inline-block;
+        }
+        .ai-badge-title {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.2em;
+            color: var(--c-roxo-fume);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .impact-pill {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            padding: 3px 12px;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .impact-positive {
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+        .impact-neutral {
+            background: rgba(140, 121, 192, 0.12);
+            color: #c4b5fd;
+            border: 1px solid rgba(140, 121, 192, 0.3);
+        }
+        .impact-risk {
+            background: rgba(244, 63, 94, 0.12);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .summary-intro-box {
+            font-size: 14px;
+            line-height: 1.65;
+            color: var(--c-papel);
+            margin-bottom: 16px;
+        }
+        .summary-intro-box strong {
+            color: #ffffff;
+        }
+        
+        .summary-section-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--c-grafite-light);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .summary-bullets-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .summary-bullet-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+        .bullet-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--c-roxo-fume);
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .bullet-label {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .summary-analysis-box {
+            background: rgba(59, 7, 100, 0.18);
+            border: 1px solid rgba(140, 121, 192, 0.25);
+            border-radius: 6px;
+            padding: 14px 18px;
+        }
+        .analysis-box-header {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+        .analysis-box-body {
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: #e2e8f0;
+        }
+
+        .doc-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--c-hairline);
+            padding-top: 14px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-generate-ai {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            background: rgba(59, 7, 100, 0.4);
+            border: 1px solid var(--c-roxo-fume);
+            color: #d8b4fe;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-generate-ai:hover {
+            background: var(--c-roxo-profundo);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(140, 121, 192, 0.3);
+            transform: translateY(-1px);
+        }
+        .cvm-external-link {
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            color: var(--c-roxo-fume);
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: color 0.2s;
+            letter-spacing: 0.06em;
         }
-        .doc-link:hover {
-            color: #93c5fd;
+        .cvm-external-link:hover {
+            color: var(--c-papel);
             text-decoration: underline;
         }
+
+        /* ================= RODAPÉ OFICIAL CF TECH (IMAGEM 2) ================= */
+        .footer-system {
+            margin-top: 60px;
+            border-top: 1px solid var(--c-hairline);
+            padding-top: 40px;
+        }
+        .footer-brand-box {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            border: 1px solid var(--c-hairline);
+            background: var(--c-card-bg);
+            margin-bottom: 24px;
+        }
+        .footer-left {
+            padding: 34px 32px;
+            border-right: 1px solid var(--c-hairline);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .footer-label {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.2em;
+            color: var(--c-roxo-fume);
+            text-transform: uppercase;
+        }
+        .footer-desc {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--c-papel);
+        }
+        .footer-desc strong {
+            color: #ffffff;
+        }
+        .footer-disclaimer {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--c-grafite-light);
+            border-top: 1px solid var(--c-hairline);
+            padding-top: 12px;
+            margin-top: 6px;
+        }
+
+        .footer-right {
+            background: #070709;
+            padding: 34px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .social-nav-title {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.24em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .social-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--c-hairline);
+            border-radius: 6px;
+            color: var(--c-papel);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .social-btn-inner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .social-btn i {
+            font-size: 16px;
+            color: var(--c-roxo-fume);
+        }
+        .social-arrow {
+            font-family: var(--font-mono);
+            color: var(--c-roxo-fume);
+            transition: transform 0.2s;
+        }
+        .social-btn:hover {
+            background: rgba(59, 7, 100, 0.3);
+            border-color: var(--c-roxo-fume);
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+        .social-btn:hover .social-arrow {
+            transform: translateX(3px);
+            color: #ffffff;
+        }
+
+        .bottom-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            color: var(--c-grafite-light);
+            text-transform: uppercase;
+            padding: 14px 0 30px;
+        }
+
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
+            padding: 70px 20px;
+            color: var(--c-grafite-light);
             font-size: 15px;
+            border: 1px dashed var(--c-hairline);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 900px) {
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .metric-cell:nth-child(2) { border-right: none; }
+            .search-inputs-row { grid-template-columns: 1fr; }
+            .footer-brand-box { grid-template-columns: 1fr; }
+            .footer-left { border-right: none; border-bottom: 1px solid var(--c-hairline); }
+            .hero-title { font-size: 38px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Faixa Técnica / Marquee Tape Oficial -->
+    <div class="marquee-bar">
+        <div class="marquee-track">
+            <span>DADOS DIRETO DA CVM &bull; ESCALA ORIGINAL, SEM ABREVIAÇÃO &bull; 680+ EMPRESAS B3 &bull; SEM CADASTRO &bull; SEM ARMAZENAMENTO &bull; IA GEMINI 3.1 FLASH LITE &bull; CEARÁ FINANCE &bull; FRONT OFFICE DE TECNOLOGIA &bull;</span>
+            <span>DADOS DIRETO DA CVM &bull; ESCALA ORIGINAL, SEM ABREVIAÇÃO &bull; 680+ EMPRESAS B3 &bull; SEM CADASTRO &bull; SEM ARMAZENAMENTO &bull; IA GEMINI 3.1 FLASH LITE &bull; CEARÁ FINANCE &bull; FRONT OFFICE DE TECNOLOGIA &bull;</span>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- Header Oficial -->
         <header>
-            <div class="brand">
-                <img src="/LOGO_CF.png" alt="Ceará Finance" onerror="this.style.display='none'">
-                <div class="brand-title">
-                    <h1>Alertas & Consultas CVM</h1>
-                    <p>680+ Empresas B3 &bull; Inteligência Regulatória</p>
+            <div class="brand-lockup">
+                <div class="cf-mark-brackets">
+                    <span class="bracket">[</span>
+                    <!-- Touro Minimalista Vetorial CF Tech -->
+                    <svg class="bull-icon-svg" viewBox="0 0 32 32">
+                        <path d="M6 10C5 8.5 3 6.5 3 4.5C3 3.5 4 3 5 3C6.8 3 8.5 5.8 9.5 8C11.5 7.2 13.7 6.8 16 6.8C18.3 6.8 20.5 7.2 22.5 8C23.5 5.8 25.2 3 27 3C28 3 29 3.5 29 4.5C29 6.5 27 8.5 26 10C27.5 12.2 28.5 14.8 28.5 17.5C28.5 23.5 23 27.5 16 27.5C9 27.5 3.5 23.5 3.5 17.5C3.5 14.8 4.5 12.2 6 10ZM10.5 13.5C9.7 13.5 9 14.2 9 15C9 15.8 9.7 16.5 10.5 16.5C11.3 16.5 12 15.8 12 15C12 14.2 11.3 13.5 10.5 13.5ZM21.5 13.5C20.7 13.5 20 14.2 20 15C20 15.8 20.7 16.5 21.5 16.5C22.3 16.5 23 15.8 23 15C23 14.2 22.3 13.5 21.5 13.5Z"/>
+                    </svg>
+                    <span class="bracket">]</span>
+                </div>
+                <div class="brand-text">
+                    <div class="brand-title">CF <span>TECH</span></div>
+                    <div class="brand-sub">CEARÁ FINANCE &bull; FRONT OFFICE DE TECNOLOGIA</div>
                 </div>
             </div>
-            <div class="header-nav">
-                <a href="http://localhost:8000" class="btn-nav"><i class="fas fa-arrow-left"></i> Hub Principal</a>
-                <button onclick="carregarDocs()" class="btn-nav"><i class="fas fa-rotate"></i> Atualizar</button>
+
+            <div class="header-actions">
+                <a href="http://localhost:8000" class="btn-top"><i class="fas fa-arrow-left"></i> FINANCE HUB</a>
+                <button onclick="carregarDocs()" class="btn-top"><i class="fas fa-rotate"></i> ATUALIZAR</button>
             </div>
         </header>
 
-        <div class="metrics-bar">
-            <div class="metric-card">
-                <div class="metric-label">Documentos Oficiais 2026</div>
-                <div class="metric-val" id="metric-total">33.541</div>
+        <!-- Capa Conceitual -->
+        <section class="hero-section">
+            <div class="hero-tag">01 &bull; REGULATÓRIO & PARECERES DE RI</div>
+            <h1 class="hero-title">Demonstrações e fatos relevantes,<br>direto da CVM.</h1>
+            <p class="hero-subtitle">
+                Busque uma empresa listada por ticker ou código CVM. Resumos executivos sintetizados por inteligência artificial, dados sem filtro, sem ruído e em escala original.
+            </p>
+        </section>
+
+        <!-- Métricas em Grid Técnico (Manual de Marca) -->
+        <div class="metrics-grid">
+            <div class="metric-cell">
+                <div class="metric-cell-label">01 &bull; Documentos Oficiais 2026</div>
+                <div class="metric-cell-val" id="metric-total">33.541</div>
+                <div class="metric-cell-sub">Protocolos registrados na CVM</div>
             </div>
-            <div class="metric-card">
-                <div class="metric-label">Fatos Relevantes Catalogados</div>
-                <div class="metric-val" id="metric-fr">4.041</div>
+            <div class="metric-cell">
+                <div class="metric-cell-label">02 &bull; Fatos Relevantes</div>
+                <div class="metric-cell-val" id="metric-fr">4.041</div>
+                <div class="metric-cell-sub">Eventos com impacto no mercado</div>
             </div>
-            <div class="metric-card">
-                <div class="metric-label">Universo de Empresas B3</div>
-                <div class="metric-val" id="metric-cia">684</div>
+            <div class="metric-cell">
+                <div class="metric-cell-label">03 &bull; Universo B3 & CVM</div>
+                <div class="metric-cell-val" id="metric-cia">684</div>
+                <div class="metric-cell-sub">Empresas com cobertura ativa</div>
             </div>
-            <div class="metric-card ai-card">
-                <div class="metric-label">Motor de IA Executiva</div>
-                <div class="metric-val" style="color: #a855f7; font-size: 17px; display:flex; align-items:center; gap:8px;">
-                    <i class="fas fa-brain"></i> Gemini 3.1 Flash Lite
+            <div class="metric-cell">
+                <div class="metric-cell-label">04 &bull; Inteligência Artificial</div>
+                <div class="metric-cell-val" style="color: var(--c-roxo-fume); font-size: 20px; display:flex; align-items:center; gap:8px;">
+                    <span class="ai-pulse-dot"></span> Gemini 3.1
                 </div>
+                <div class="metric-cell-sub">Síntese executiva & viés RI</div>
             </div>
         </div>
 
-        <!-- Search & Filter Section -->
-        <div class="search-section">
-            <div class="search-title">
-                <i class="fas fa-bolt" style="color: var(--accent);"></i> Consulta Instantânea por Ticker ou Código CVM
+        <!-- Seção de Busca e Filtros -->
+        <div class="search-container">
+            <div class="search-label">
+                <i class="fas fa-terminal"></i> Consulta por Ticker, Razão Social ou Código CVM
             </div>
-            <div class="search-row">
-                <div class="search-box">
+            <div class="search-inputs-row">
+                <div class="search-box-wrap">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="input-search" list="lista-empresas" placeholder="Digite qualquer ticker, código CVM ou nome (ex: MGLU3, ITUB4, PETR4, BBAS3, VALE3, RENT3)..." oninput="debounceSearch()">
+                    <input type="text" id="input-search" list="lista-empresas" placeholder="Buscar por nome, CNPJ, ticker ou código CVM (ex: ITUB4, MGLU3, PETR4, BBAS3, VALE3)..." oninput="debounceSearch()">
                     <datalist id="lista-empresas"></datalist>
                 </div>
-                <select class="select-company" id="select-empresa" onchange="selecionarDropdown(this.value)">
+                <select class="select-company-dropdown" id="select-empresa" onchange="selecionarDropdown(this.value)">
                     <option value="">-- Selecionar Empresa (680+ B3) --</option>
                 </select>
             </div>
 
-            <div class="filter-pills">
-                <span class="pill-label">Mais Acessadas:</span>
-                <button class="pill active" onclick="filtrarPill('', this)">Todas</button>
-                <button class="pill" onclick="filtrarPill('Fato Relevante', this)">Fatos Relevantes</button>
-                <button class="pill" onclick="filtrarPill('Comunicado', this)">Comunicados</button>
-                <button class="pill" onclick="filtrarPill('PETR4', this)">PETR4</button>
-                <button class="pill" onclick="filtrarPill('VALE3', this)">VALE3</button>
-                <button class="pill" onclick="filtrarPill('ITUB4', this)">ITUB4</button>
-                <button class="pill" onclick="filtrarPill('BBAS3', this)">BBAS3</button>
-                <button class="pill" onclick="filtrarPill('MGLU3', this)">MGLU3</button>
-                <button class="pill" onclick="filtrarPill('RENT3', this)">RENT3</button>
-                <button class="pill" onclick="filtrarPill('WEGE3', this)">WEGE3</button>
-                <button class="pill" onclick="filtrarPill('DIRR3', this)">DIRR3</button>
-                <button class="pill" onclick="filtrarPill('PRIO3', this)">PRIO3</button>
+            <div class="filter-pills-row">
+                <span class="pills-prefix">FILTROS RÁPIDOS:</span>
+                <button class="pill-btn active" onclick="filtrarPill('', this)">Todas</button>
+                <button class="pill-btn" onclick="filtrarPill('Fato Relevante', this)">Fatos Relevantes</button>
+                <button class="pill-btn" onclick="filtrarPill('Comunicado', this)">Comunicados</button>
+                <button class="pill-btn" onclick="filtrarPill('PETR4', this)">PETR4</button>
+                <button class="pill-btn" onclick="filtrarPill('VALE3', this)">VALE3</button>
+                <button class="pill-btn" onclick="filtrarPill('ITUB4', this)">ITUB4</button>
+                <button class="pill-btn" onclick="filtrarPill('BBAS3', this)">BBAS3</button>
+                <button class="pill-btn" onclick="filtrarPill('MGLU3', this)">MGLU3</button>
+                <button class="pill-btn" onclick="filtrarPill('RENT3', this)">RENT3</button>
+                <button class="pill-btn" onclick="filtrarPill('WEGE3', this)">WEGE3</button>
+                <button class="pill-btn" onclick="filtrarPill('DIRR3', this)">DIRR3</button>
+                <button class="pill-btn" onclick="filtrarPill('PRIO3', this)">PRIO3</button>
             </div>
         </div>
 
-        <!-- Dynamic Company Profile Card -->
-        <div id="company-profile" class="company-profile-card">
-            <div class="profile-row">
-                <div class="profile-left">
-                    <div class="profile-ticker" id="p-ticker">B3</div>
-                    <div class="profile-title">
+        <!-- Card de Perfil da Empresa -->
+        <div id="company-profile" class="company-profile-banner">
+            <div class="profile-flex">
+                <div class="profile-company-info">
+                    <div class="profile-ticker-tag" id="p-ticker">B3</div>
+                    <div class="profile-names">
                         <h2 id="p-name">Companhia Aberta</h2>
                         <p id="p-sector">Setor de Atuação</p>
                     </div>
                 </div>
-                <div class="profile-tags">
-                    <div class="profile-badge">CVM: <strong id="p-cvm">-</strong></div>
-                    <div class="profile-badge">CNPJ: <strong id="p-cnpj">-</strong></div>
-                    <div class="profile-badge"><i class="fas fa-check-circle" style="color: var(--accent);"></i> <strong>100% Monitorado</strong></div>
+                <div class="profile-tags-row">
+                    <div class="profile-data-chip">CVM: <strong id="p-cvm">-</strong></div>
+                    <div class="profile-data-chip">CNPJ: <strong id="p-cnpj">-</strong></div>
+                    <div class="profile-data-chip" style="color: #4ade80;"><i class="fas fa-circle-check"></i> <strong>100% Monitorado</strong></div>
                 </div>
             </div>
         </div>
 
-        <!-- Document Feed -->
-        <div id="docs-list" class="docs-list">
+        <!-- Feed de Documentos -->
+        <div id="docs-list" class="docs-feed">
             <div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Carregando base de comunicados oficiais da CVM...</div>
         </div>
+
+        <!-- ================= RODAPÉ OFICIAL CF TECH (IMAGEM 2) ================= -->
+        <footer class="footer-system">
+            <div class="footer-brand-box">
+                <!-- Lado Esquerdo -->
+                <div class="footer-left">
+                    <div class="footer-label">O QUE É O CF TECH</div>
+                    <div class="footer-desc">
+                        <strong>CF Tech</strong> é o <strong>Front Office de tecnologia</strong> da Ceará Finance — construído sobre três pilares: <strong>didática, criatividade e tecnologia</strong>. Esse hub é um dos nossos experimentos: pegar dado público e denso (como as demonstrações e fatos relevantes da CVM) e deixar acessível, sem cadastro e sem fricção.
+                    </div>
+                    <div class="footer-disclaimer">
+                        Projeto independente de tecnologia da Ceará Finance. Os dados vêm direto da CVM (Comissão de Valores Mobiliários); não há vínculo, afiliação ou verificação por parte do órgão regulador.
+                    </div>
+                </div>
+
+                <!-- Lado Direito (SIGA A LIGA) -->
+                <div class="footer-right">
+                    <div>
+                        <div class="social-nav-title">SIGA A LIGA</div>
+                        <div class="social-links-list">
+                            <a href="https://www.instagram.com/cearafinance/" target="_blank" class="social-btn">
+                                <div class="social-btn-inner">
+                                    <i class="fab fa-instagram"></i>
+                                    <span>Instagram</span>
+                                </div>
+                                <span class="social-arrow">→</span>
+                            </a>
+                            <a href="https://www.linkedin.com/company/ceara-finance/posts/?feedView=all" target="_blank" class="social-btn">
+                                <div class="social-btn-inner">
+                                    <i class="fab fa-linkedin"></i>
+                                    <span>LinkedIn</span>
+                                </div>
+                                <span class="social-arrow">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-line">
+                <div>CF TECH &bull; CEARÁ FINANCE &bull; DADOS PÚBLICOS DA CVM &bull; MANUAL DE MARCA v2</div>
+                <div>EDIÇÃO 2026 &bull; USO INTERNO</div>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -739,7 +1208,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
 
         function filtrarPill(cat, btn) {
             filtroAtivo = cat;
-            document.querySelectorAll('.filter-pills .pill').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-pills-row .pill-btn').forEach(b => b.classList.remove('active'));
             if (btn) btn.classList.add('active');
             
             document.getElementById('input-search').value = cat;
@@ -750,7 +1219,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             if (!ticker) return;
             document.getElementById('input-search').value = ticker;
             filtroAtivo = ticker;
-            document.querySelectorAll('.filter-pills .pill').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-pills-row .pill-btn').forEach(b => b.classList.remove('active'));
             carregarDocs(ticker);
         }
 
@@ -762,6 +1231,117 @@ class CVMHandler(SimpleHTTPRequestHandler):
             }, 300);
         }
 
+        /* ================= FORMATADOR DE RESUMO EXECUTIVO DIDÁTICO ================= */
+        function formatarResumoExecutivo(textoBruto) {
+            if (!textoBruto || textoBruto.includes('404 NOT_FOUND') || textoBruto.toLowerCase().includes('error')) {
+                return '';
+            }
+
+            let text = textoBruto.trim();
+
+            // Detectar Classificação de Impacto
+            let impacto = 'NEUTRO';
+            let impactoClass = 'impact-neutral';
+
+            const lower = text.toLowerCase();
+            if (lower.includes('classificado como **positivo') || lower.includes('classificação: **positivo') || lower.includes('impacto positivo')) {
+                impacto = 'POSITIVO';
+                impactoClass = 'impact-positive';
+            } else if (lower.includes('classificado como **negativo') || lower.includes('atenção') || lower.includes('risco')) {
+                impacto = 'ATENÇÃO / RISCO';
+                impactoClass = 'impact-risk';
+            } else if (lower.includes('classificado como **neutro') || lower.includes('classificação: **neutro')) {
+                impacto = 'NEUTRO';
+                impactoClass = 'impact-neutral';
+            }
+
+            // Limpar introduções redundantes de prompt antigo
+            text = text.replace(/^Como Analista de RI[^:]*:\s*/i, '');
+            text = text.replace(/^Prezado\(a\)[^:]*:\s*/i, '');
+
+            // Separar seções por cabeçalhos ###
+            const parts = text.split(/###\s*\**([^*]+)\**/);
+
+            let html = `
+            <div class="ai-summary-card">
+                <div class="ai-summary-top">
+                    <div class="ai-summary-badge">
+                        <span class="bull-bracket">[</span>
+                        <span class="ai-pulse-dot"></span>
+                        <span class="bull-bracket">]</span>
+                        <span class="ai-badge-title">PARECER EXECUTIVO DE RI &bull; GEMINI 3.1</span>
+                    </div>
+                    <div class="impact-pill ${impactoClass}">${impacto}</div>
+                </div>
+            `;
+
+            if (parts.length > 1) {
+                const intro = parts[0].trim();
+                if (intro && intro.length > 15) {
+                    const introFmt = formatarNegrito(intro);
+                    html += `<div class="summary-intro-box">${introFmt}</div>`;
+                }
+
+                for (let i = 1; i < parts.length; i += 2) {
+                    const header = (parts[i] || '').replace(/[*#]/g, '').trim();
+                    const body = (parts[i + 1] || '').trim();
+
+                    const isAnalysis = header.toLowerCase().includes('investidor') || header.toLowerCase().includes('análise') || header.toLowerCase().includes('impacto');
+
+                    if (isAnalysis) {
+                        const bodyFmt = formatarNegrito(body);
+                        html += `
+                        <div class="summary-analysis-box">
+                            <div class="analysis-box-header">
+                                <i class="fas fa-compass"></i>
+                                <span>${header.toUpperCase()}</span>
+                            </div>
+                            <div class="analysis-box-body">${bodyFmt}</div>
+                        </div>
+                        `;
+                    } else {
+                        html += `
+                        <div class="summary-section-label">
+                            <i class="fas fa-angle-right"></i> ${header.toUpperCase()}
+                        </div>
+                        <div class="summary-bullets-grid">
+                        `;
+
+                        const lines = body.split('\\n');
+                        for (let line of lines) {
+                            line = line.trim();
+                            if (!line) continue;
+
+                            if (line.startsWith('*') || line.startsWith('-')) {
+                                let bullet = line.replace(/^[\\*\\-]\\s*/, '').trim();
+                                bullet = formatarNegrito(bullet);
+                                html += `
+                                <div class="summary-bullet-item">
+                                    <span class="bullet-dot"></span>
+                                    <div>${bullet}</div>
+                                </div>
+                                `;
+                            } else {
+                                html += `<div class="summary-intro-box">${formatarNegrito(line)}</div>`;
+                            }
+                        }
+                        html += `</div>`;
+                    }
+                }
+            } else {
+                html += `<div class="summary-intro-box">${formatarNegrito(text)}</div>`;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function formatarNegrito(str) {
+            return str
+                .replace(/\\*\\*([^\\*]+)\\*\\*/g, '<strong class="bullet-label">$1</strong>')
+                .replace(/\\*([^\\*]+)\\*/g, '<em>$1</em>');
+        }
+
         async function gerarResumo(link, ticker, btnEl) {
             btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando Análise RI via Gemini...';
             btnEl.disabled = true;
@@ -769,11 +1349,11 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 const res = await fetch(`/api/resumir?link=${encodeURIComponent(link)}&ticker=${encodeURIComponent(ticker)}`);
                 const data = await res.json();
                 if (data.status === 'ok' && data.resumo) {
-                    const card = btnEl.closest('.doc-item');
-                    const summaryDiv = document.createElement('div');
-                    summaryDiv.className = 'doc-summary';
-                    summaryDiv.innerHTML = `<i class="fas fa-brain" style="color: #c084fc; margin-right: 6px;"></i><strong>Resumo Executivo (Agente RI):</strong> ${data.resumo}`;
-                    card.insertBefore(summaryDiv, card.querySelector('.doc-footer'));
+                    const card = btnEl.closest('.doc-card');
+                    const summaryHtml = formatarResumoExecutivo(data.resumo);
+                    const temp = document.createElement('div');
+                    temp.innerHTML = summaryHtml;
+                    card.insertBefore(temp.firstElementChild, card.querySelector('.doc-card-footer'));
                     btnEl.remove();
                 } else {
                     btnEl.innerText = 'Falha ao resumir. Tentar novamente';
@@ -790,7 +1370,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
             let docs = [...todosDocumentos];
 
             if (docs.length === 0) {
-                listEl.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open" style="font-size: 36px; margin-bottom: 12px; display:block; opacity:0.5;"></i>Nenhum documento encontrado na base para este critério.</div>';
+                listEl.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open" style="font-size: 36px; margin-bottom: 12px; display:block; opacity:0.4;"></i>Nenhum documento encontrado na base para este critério de busca.</div>';
                 return;
             }
 
@@ -803,28 +1383,23 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 const desc = d.description || 'Divulgação oficial registrada no sistema da CVM.';
                 const isFR = cat.toLowerCase().includes('relevante') || (d.doc_type || '').toLowerCase().includes('relevante');
 
-                // Sanitização do resumo IA: nunca exibir erros técnicos brutos
-                let resumoHtml = '';
-                if (d.resumo_ia && !d.resumo_ia.includes('404 NOT_FOUND') && !d.resumo_ia.toLowerCase().includes('error')) {
-                    resumoHtml = `<div class="doc-summary"><i class="fas fa-brain" style="color: #c084fc; margin-right: 6px;"></i><strong>Resumo Executivo (Agente RI):</strong> ${d.resumo_ia}</div>`;
-                }
-
-                const btnResumo = !resumoHtml && d.link ? `<button class="btn-ai-sum" onclick="gerarResumo('${d.link}', '${ticker}', this)"><i class="fas fa-wand-magic-sparkles"></i> Gerar Resumo IA (Gemini)</button>` : '';
-                const link = d.link ? `<a href="${d.link}" target="_blank" class="doc-link">Acessar Documento Oficial CVM <i class="fas fa-external-link-alt"></i></a>` : '';
+                const resumoHtml = d.resumo_ia ? formatarResumoExecutivo(d.resumo_ia) : '';
+                const btnResumo = !resumoHtml && d.link ? `<button class="btn-generate-ai" onclick="gerarResumo('${d.link}', '${ticker}', this)"><i class="fas fa-wand-magic-sparkles"></i> Gerar Parecer IA (Gemini)</button>` : '';
+                const link = d.link ? `<a href="${d.link}" target="_blank" class="cvm-external-link">Acessar Documento Oficial CVM <i class="fas fa-external-link-alt"></i></a>` : '';
 
                 html += `
-                <div class="doc-item">
-                    <div class="doc-header">
-                        <div class="doc-title-line">
-                            <span class="ticker-tag">${ticker}</span>
-                            <span class="company-name">${comp}</span>
-                            <span class="doc-category ${isFR ? 'fr' : ''}">${cat}</span>
+                <div class="doc-card">
+                    <div class="doc-card-header">
+                        <div class="doc-meta-left">
+                            <span class="ticker-pill">[ ${ticker} ]</span>
+                            <span class="company-heading">${comp}</span>
+                            <span class="category-chip ${isFR ? 'fr' : ''}">${cat}</span>
                         </div>
-                        <div class="doc-meta"><i class="far fa-calendar-alt"></i> ${data}</div>
+                        <div class="doc-date"><i class="far fa-calendar"></i> ${data}</div>
                     </div>
-                    <div class="doc-desc">${desc}</div>
+                    <div class="doc-subject">${desc}</div>
                     ${resumoHtml}
-                    <div class="doc-footer">
+                    <div class="doc-card-footer">
                         ${btnResumo}
                         ${link}
                     </div>

@@ -68,24 +68,33 @@ def resumir_documento(doc_info, url):
     contexto_documento = extrair_texto_url(url)
     
     prompt = f"""
-Você é um Analista de RI de alta performance da Ceará Finance.
-Sua tarefa é ler as informações e o contexto de um documento corporativo divulgado na CVM e fazer um Resumo Executivo profissional, conciso e objetivo.
+Você é o Analista de Relações com Investidores (RI) da Ceará Finance (CF Tech).
+Sua missão é sintetizar o documento regulatório oficial da CVM em um Parecer Executivo didático, limpo, analítico e sem enrolação.
 
-Informações Gerais do Documento:
+DADOS DO DOCUMENTO:
 - Empresa: {doc_info.get('company_name')} (Ticker: {doc_info.get('ticker')})
 - Categoria: {doc_info.get('category')}
-- Tipo de Documento: {doc_info.get('doc_type')}
-- Descrição: {doc_info.get('description')}
+- Tipo: {doc_info.get('doc_type')}
+- Assunto/Descrição: {doc_info.get('description')}
 - Data de Divulgação: {doc_info.get('delivery_date')}
-- Link de Acesso: {url}
+- Link Oficial: {url}
 
-Conteúdo Extraído do Documento (Contexto):
+CONTEÚDO EXTRAÍDO:
 \"\"\"{contexto_documento[:20000]}\"\"\"
 
-Instruções para o Resumo:
-1. Comece com 3 tópicos (bullet points) destacando os pontos mais importantes e o impacto para a empresa.
-2. Escreva um parágrafo final explicando se este fato é Positivo, Neutro ou Negativo para o investidor de longo prazo, justificando brevemente.
-3. Seja conciso e evite termos puramente genéricos.
+ESTRUTURA OBRIGATÓRIA DA RESPOSTA (Siga rigorosamente estes cabeçalhos):
+NÃO use introduções protocolares (ex: "Como analista de RI...", "Apresento o resumo..."). Comece diretamente pelo conteúdo:
+
+### Síntese do Evento
+[1 a 2 frases diretas explicando o fato essencial que a companhia protocolou na CVM].
+
+### Destaques Principais
+* **[Título do Ponto 1]:** [Explicação clara do ponto operacional, governança ou valor financeiro].
+* **[Título do Ponto 2]:** [Datas, números, condições ou deliberações relevantes].
+* **[Título do Ponto 3]:** [Impacto imediato nos negócios ou nas ações].
+
+### Análise para o Investidor de Longo Prazo
+Classificação: **[Positivo | Neutro | Atenção / Risco]**. [Análise de 2 a 3 frases sobre o impacto deste documento nos fundamentos da empresa, dividendos, governança ou riscos para o acionista].
 """
 
     def call_gemini():
