@@ -305,9 +305,9 @@ class CVMHandler(SimpleHTTPRequestHandler):
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 22px 0;
             border-bottom: 1px solid var(--c-hairline);
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
 
         .brand-lockup {
@@ -316,10 +316,15 @@ class CVMHandler(SimpleHTTPRequestHandler):
             gap: 16px;
         }
         .logo-cf-banner {
-            height: 46px;
-            max-width: 250px;
+            height: 75px;
+            max-width: 390px;
             object-fit: contain;
             display: block;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+            transition: transform 0.2s;
+        }
+        .logo-cf-banner:hover {
+            transform: scale(1.02);
         }
 
         .header-actions {
@@ -1347,6 +1352,7 @@ class CVMHandler(SimpleHTTPRequestHandler):
         }
 
         @media (max-width: 900px) {
+            .logo-cf-banner { height: 54px; max-width: 280px; }
             .metrics-grid { grid-template-columns: 1fr 1fr; }
             .metric-cell:nth-child(2) { border-right: none; }
             .search-inputs-row { grid-template-columns: 1fr; }
