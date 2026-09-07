@@ -1,6 +1,7 @@
 import os
 import re
 import time
+import urllib.parse
 import requests
 
 try:
@@ -230,4 +231,8 @@ Seu número de WhatsApp foi conectado com sucesso ao sistema de monitoramento CV
 Classificação: **Positivo**. O canal direto de alertas reduz a assimetria de informação e garante acompanhamento em tempo real.""".replace("{ticker}", ticker.upper())
 
     texto = formatar_alerta_whatsapp(doc_teste, resumo_teste)
-    return enviar_mensagem_whatsapp(telefone, texto)
+    res = enviar_mensagem_whatsapp(telefone, texto)
+    clean_tel = limpar_numero_whatsapp(telefone)
+    res["texto_formatado"] = texto
+    res["whatsapp_url"] = f"https://api.whatsapp.com/send?phone={clean_tel}&text={urllib.parse.quote(texto)}"
+    return res

@@ -1128,11 +1128,58 @@ class CVMHandler(SimpleHTTPRequestHandler):
             border: 1px solid rgba(34, 197, 94, 0.4);
             color: #86efac;
         }
+        .wpp-alert-box.info {
+            display: block;
+            background: rgba(140, 121, 192, 0.12);
+            border: 1px solid rgba(140, 121, 192, 0.35);
+            color: var(--c-papel);
+        }
         .wpp-alert-box.error {
             display: block;
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid rgba(239, 68, 68, 0.4);
             color: #fca5a5;
+        }
+        .btn-open-wpp-now {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #22c55e;
+            color: #ffffff !important;
+            text-decoration: none !important;
+            padding: 9px 16px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            box-shadow: 0 3px 12px rgba(34, 197, 94, 0.4);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .btn-open-wpp-now:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(34, 197, 94, 0.6);
+        }
+        .wpp-guide-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--c-hairline);
+            border-radius: 4px;
+            padding: 10px 14px;
+            margin-top: 14px;
+            font-size: 11.5px;
+            line-height: 1.5;
+            color: var(--c-grafite-light);
+        }
+        .wpp-guide-title {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            color: var(--c-roxo-fume);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
         .wpp-registered-list {
             margin-top: 20px;
@@ -1561,6 +1608,18 @@ class CVMHandler(SimpleHTTPRequestHandler):
                     <div class="wpp-registered-title">Números Conectados para Alertas</div>
                     <div id="wpp-active-list">
                         <div style="font-size:12px; color:var(--c-grafite-light); opacity:0.6;">Carregando números...</div>
+                    </div>
+                </div>
+
+                <div class="wpp-guide-box">
+                    <div class="wpp-guide-title"><i class="fas fa-circle-info"></i> Como receber automaticamente 24h?</div>
+                    <div>
+                        O envio 100% autônomo (direto no seu celular sem precisar clicar) requer conectar um Gateway de envio no arquivo <code>agente_cvm/.env</code>:
+                        <ul style="margin: 6px 0 0 16px; padding: 0;">
+                            <li><strong>Z-API:</strong> Crie uma conta teste gratuita em <em>z-api.io</em>, escaneie o QR Code e preencha <code>ZAPI_TOKEN</code>.</li>
+                            <li><strong>Evolution API:</strong> Conexão local gratuita via Docker.</li>
+                            <li><strong>Telegram:</strong> Já está 100% configurado no projeto!</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -2001,8 +2060,30 @@ class CVMHandler(SimpleHTTPRequestHandler):
                 });
                 const data = await res.json();
                 if (data.status === 'ok') {
-                    feedback.className = 'wpp-alert-box success';
-                    feedback.innerHTML = `<strong>Teste gerado com sucesso!</strong> Mensagem formatada enviada para o canal de +${phone} (${ticker}).`;
+                    const resInfo = data.resultado || {};
+                    const isMock = resInfo.status === 'simulado' || resInfo.provedor === 'mock_cf_tech';
+                    const cleanPhone = phone.replace(/\D/g, '');
+                    const wppUrl = resInfo.whatsapp_url || `https://api.whatsapp.com/send?phone=55${cleanPhone}&text=${encodeURIComponent(resInfo.texto_formatado || '')}`;
+
+                    if (isMock) {
+                        feedback.className = 'wpp-alert-box info';
+                        feedback.innerHTML = `
+                            <div style="margin-bottom: 6px;">
+                                <strong style="color:#4ade80;"><i class="fas fa-circle-check"></i> Mensagem Formatada com Sucesso!</strong>
+                            </div>
+                            <div style="font-size:12px; color:var(--c-papel); line-height:1.5; margin-bottom:10px;">
+                                O parecer executivo do Gemini para <strong>${ticker}</strong> foi gerado. Como seu computador ainda não possui uma chave de envio autônomo (Z-API/Evolution) no <code>.env</code>, você pode abrir o WhatsApp agora mesmo para ver e receber a notificação pronta:
+                            </div>
+                            <div>
+                                <a href="${wppUrl}" target="_blank" class="btn-open-wpp-now">
+                                    <i class="fab fa-whatsapp"></i> ABRIR E ENVIAR NO MEU WHATSAPP AGORA
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        feedback.className = 'wpp-alert-box success';
+                        feedback.innerHTML = `<strong>Enviado com sucesso!</strong> Transmitido via ${resInfo.provedor} para +${resInfo.telefone} (${ticker}).`;
+                    }
                 } else {
                     feedback.className = 'wpp-alert-box error';
                     feedback.innerText = data.error || 'Erro no envio do teste.';
